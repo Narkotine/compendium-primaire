@@ -22,7 +22,12 @@ import { reste } from './reste';
 import { divpose } from './divpose';
 import { divisible } from './divisible';
 import { probdiv } from './probdiv';
+import { partsegales, colorier, lirefrac } from './frac/figures';
+import { fracdroite, fraclire, egales, fraccomp, entierfrac } from './frac/nombres';
+import { fracsomme, fracquant } from './frac/calculs';
+import { fracpb } from './frac/histoires';
+import { probfrac } from './probfrac';
 import type { ExoType } from '../engine/types';
 /** Exercices du chapitre 1, dans l'ordre des notions du cours. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const EXOS: Record<string, ExoType<any, any>> = { echanger, tableau, dizaines, ranger, droite, lire, grands, suites, complements, mental, addpose, subpose, probadd, rectangle, tables, doubles, fois10, mulpose, multiples, probmul, partage, famille, reste, divpose, divisible, probdiv };
+export const EXOS: Record<string, ExoType<any, any>> = { echanger, tableau, dizaines, ranger, droite, lire, grands, suites, complements, mental, addpose, subpose, probadd, rectangle, tables, doubles, fois10, mulpose, multiples, probmul, partage, famille, reste, divpose, divisible, probdiv, partsegales, colorier, lirefrac, fracdroite, fraclire, egales, fraccomp, entierfrac, fracsomme, fracquant, fracpb, probfrac };

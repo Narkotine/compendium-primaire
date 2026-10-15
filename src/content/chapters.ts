@@ -50,4 +50,18 @@ export const CHAPTERS: Chapter[] = [
     ],
     exos: ['probdiv', 'partage', 'famille', 'reste', 'divpose', 'divisible'],
   },
+  {
+    slug: 'fractions', n: 5, title: 'Les fractions', short: 'Fractions',
+    notions: [
+      { t: 'Des parts égales d’un tout', lv: ['CE1', 'CE2'] },
+      { t: 'Lire et écrire une fraction', lv: ['CE1', 'CE2', 'CM1', 'CM2'] },
+      { t: 'Comparer des fractions', lv: ['CE1', 'CE2', 'CM1', 'CM2'] },
+      { t: 'Ajouter et enlever des fractions', lv: ['CE1', 'CE2', 'CM1', 'CM2'] },
+      { t: 'Fractions égales', lv: ['CE2', 'CM1', 'CM2'] },
+      { t: 'La fraction est un nombre : la demi-droite', lv: ['CE2', 'CM1', 'CM2'] },
+      { t: 'Plus grand que 1 : entier + fraction', lv: ['CM1', 'CM2'] },
+      { t: 'Fraction d’une quantité', lv: ['CM1', 'CM2'] },
+    ],
+    exos: ['fracpb', 'probfrac', 'partsegales', 'colorier', 'lirefrac', 'fraccomp', 'fracsomme', 'egales', 'fracdroite', 'fraclire', 'entierfrac', 'fracquant'],
+  },
 ];

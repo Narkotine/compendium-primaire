@@ -82,7 +82,7 @@ export function makeProblemExo(id: string, title: string, notion: string, levels
     correction: (d) => `<p>Calcul : <b>${d.inst.model}${d.inst.exprValue === undefined ? ` = ${fmt(d.inst.answer)}` : ''}</b></p><p>Réponse : ${fmt(d.inst.answer)} ${d.inst.unit}.</p>${d.inst.useless.length ? `<p class="small">${d.inst.useless.map(fmt).join(', ')} ne servai${d.inst.useless.length > 1 ? 'ent' : 't'} à rien.</p>` : ''}`,
     mount(el, d) {
       const i = d.inst;
-      const all = [...new Set([...i.nums, ...i.useless])];
+      const all = [...i.nums, ...i.useless.filter((u) => !i.nums.includes(u))]; // un même nombre peut servir deux fois (28 − 28 ÷ 4)
       el.innerHTML = `<p class="pb-text">${i.text}</p><p class="q"><b>${i.question}</b></p>
         <p class="tip">1. Écris le calcul avec les étiquettes.</p><div class="w-ex"></div>
         <p class="tip">2. Calcule le résultat.</p><div class="w-kp"></div>`;

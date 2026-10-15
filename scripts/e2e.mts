@@ -15,6 +15,9 @@ import { mulpose, partials } from '../src/exos/mulpose';
 import { multiples } from '../src/exos/multiples';
 import { rectangle } from '../src/exos/rectangle';
 import { partage } from '../src/exos/partage';
+import { colorier, lirefrac, partsegales } from '../src/exos/frac/figures';
+import { fracdroite, fraccomp } from '../src/exos/frac/nombres';
+import { fracsomme } from '../src/exos/frac/calculs';
 import { divpose, steps } from '../src/exos/divpose';
 
 const BASE = process.argv[2] || 'http://localhost:4174/compendium-primaire/';
@@ -277,8 +280,45 @@ console.log('Chapitre 4 : division');
   await p.click('#check'); await W(60);
   t((await fb()).includes('Bravo'), 'divpose : étapes justes acceptées');
 }
+console.log('Chapitre 5 : fractions');
+{
+  const fb = () => p.$eval('.fb', (x) => x.textContent || '');
+  const typeFrac = async (n: number, d: number) => { await p.click('.fi-b[data-k="n"]'); for (const ch of String(n)) await p.click(`.co-kp [data-key="${ch}"]`); await p.click('.fi-b[data-k="d"]'); for (const ch of String(d)) await p.click(`.co-kp [data-key="${ch}"]`); };
+  const c = colorier.generate('CE2', 2, 3);
+  await open('#/exo/colorier/CE2/2/3');
+  for (let i = 0; i < c.b - c.a; i++) await p.click(`.cpart[data-k="${i}"]`);
+  await p.click('#check'); await W(60);
+  t(c.b - c.a === c.a || (await fb()).includes('numérateur'), 'colorier : complément colorié → message ciblé', await fb());
+  for (let i = 0; i < c.b - c.a; i++) await p.click(`.cpart[data-k="${i}"]`);
+  for (let i = 0; i < c.a; i++) await p.click(`.cpart[data-k="${i}"]`);
+  t((await p.$$('.cpart.on')).length === c.a, 'colorier : toucher colorie et efface');
+  await p.click('#check'); await W(60);
+  t((await fb()).includes('Bravo'), 'colorier : bon coloriage accepté');
+  const l = lirefrac.generate('CE1', 2, 5);
+  await open('#/exo/lirefrac/CE1/2/5');
+  await typeFrac(l.b, l.a); await p.click('#check'); await W(60);
+  t((await fb()).includes('inversé') && (await p.$$('.fi-b.bad')).length === 2, 'lirefrac : inversion → message, cases en rouge', await fb());
+  const fd = fracdroite.generate('CM1', 3, 2);
+  await open('#/exo/fracdroite/CM1/3/2');
+  for (let i = 0; i <= fd.k; i++) await p.click('.nl-btns [data-d="1"]'); // le 1er appui pose la flèche sur 0
+  await p.click('#check'); await W(60);
+  t((await fb()).includes('Bravo'), 'fracdroite : placer avec les flèches (fraction > 1)', await fb());
+  const fc = fraccomp.generate('CE1', 2, 4);
+  await open('#/exo/fraccomp/CE1/2/4');
+  await p.click(`.cmp [data-s="${fraccomp.solution(fc)}"]`); await p.click('#check'); await W(60);
+  t((await fb()).includes('Bravo'), 'fraccomp : signe choisi');
+  let s = 1; let fs = fracsomme.generate('CE1', 1, s); while (fs.x.d !== fs.y.d || fs.kind !== 'add') fs = fracsomme.generate('CE1', 1, ++s);
+  await open(`#/exo/fracsomme/CE1/1/${s}`);
+  await typeFrac(fs.x.n + fs.y.n, 2 * fs.x.d); await p.click('#check'); await W(60);
+  t((await fb()).includes('dénominateurs'), 'fracsomme : dénominateurs additionnés → message', await fb());
+  const pe = partsegales.generate('CE2', 2, 1);
+  await open('#/exo/partsegales/CE2/2/1');
+  for (const i of partsegales.solution(pe)) await p.click(`.pk-c[data-i="${i}"]`);
+  await p.click('#check'); await W(60);
+  t((await fb()).includes('Bravo'), 'partsegales : figures choisies');
+}
 // cibles ≥ 44 px
-for (const h of ['', '#/reglages', '#/exo/echanger/CE2/2/1', '#/exo/tableau/CE2/3/1', '#/exo/ranger/CE2/3/1', '#/exo/droite/CE1/2/1', '#/exo/droite/CE2/3/1', '#/exo/dizaines/CE2/3/1', '#/exo/droite/CM2/1/3', '#/exo/grands/CM2/3/1', '#/exo/suites/CE2/3/1', '#/exo/ranger/CM2/3/2', '#/cours/numeration', '#/exo/lire/CE2/2/1', '#/exo/addpose/CM1/3/3', '#/exo/subpose/CM1/3/3', '#/exo/probadd/CM2/3/4', '#/exo/complements/CE2/2/2', '#/exo/mental/CM1/3/2', '#/cours/addition', '#/cours/multiplication', '#/exo/mulpose/CM2/3/1', '#/exo/mulpose/CE2/1/1', '#/exo/multiples/CM1/3/2', '#/exo/rectangle/CE2/3/1', '#/exo/tables/CE2/3/1', '#/exo/fois10/CM2/3/1', '#/exo/doubles/CE1/3/1', '#/exo/probmul/CM2/3/5', '#/cours/division', '#/exo/partage/CE2/2/3', '#/exo/divpose/CM2/3/2', '#/exo/reste/CM1/2/1', '#/exo/famille/CE2/1/1', '#/exo/divisible/CM2/3/1', '#/exo/probdiv/CM1/3/2']) {
+for (const h of ['', '#/reglages', '#/exo/echanger/CE2/2/1', '#/exo/tableau/CE2/3/1', '#/exo/ranger/CE2/3/1', '#/exo/droite/CE1/2/1', '#/exo/droite/CE2/3/1', '#/exo/dizaines/CE2/3/1', '#/exo/droite/CM2/1/3', '#/exo/grands/CM2/3/1', '#/exo/suites/CE2/3/1', '#/exo/ranger/CM2/3/2', '#/cours/numeration', '#/exo/lire/CE2/2/1', '#/exo/addpose/CM1/3/3', '#/exo/subpose/CM1/3/3', '#/exo/probadd/CM2/3/4', '#/exo/complements/CE2/2/2', '#/exo/mental/CM1/3/2', '#/cours/addition', '#/cours/multiplication', '#/exo/mulpose/CM2/3/1', '#/exo/mulpose/CE2/1/1', '#/exo/multiples/CM1/3/2', '#/exo/rectangle/CE2/3/1', '#/exo/tables/CE2/3/1', '#/exo/fois10/CM2/3/1', '#/exo/doubles/CE1/3/1', '#/exo/probmul/CM2/3/5', '#/cours/division', '#/exo/partage/CE2/2/3', '#/exo/divpose/CM2/3/2', '#/exo/reste/CM1/2/1', '#/exo/famille/CE2/1/1', '#/exo/divisible/CM2/3/1', '#/exo/probdiv/CM1/3/2', '#/cours/fractions', '#/exo/partsegales/CE1/3/2', '#/exo/colorier/CM2/3/1', '#/exo/colorier/CE2/3/7', '#/exo/lirefrac/CE2/2/2', '#/exo/fracdroite/CM2/3/4', '#/exo/fraclire/CM1/3/1', '#/exo/egales/CM2/3/1', '#/exo/egales/CE2/2/1', '#/exo/fraccomp/CM1/3/1', '#/exo/entierfrac/CM1/3/1', '#/exo/entierfrac/CM2/2/2', '#/exo/fracsomme/CM2/3/1', '#/exo/fracquant/CM2/3/1', '#/exo/fracpb/CE2/3/1', '#/exo/probfrac/CM2/3/2']) {
   for (const w of [360, 390]) {
     await p.setViewport({ width: w, height: 740, isMobile: true, hasTouch: true });
     await open(h);

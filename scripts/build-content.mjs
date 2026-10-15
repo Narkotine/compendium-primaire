@@ -12,11 +12,14 @@ const chapters = [
   { slug: 'addition', dir: '02-addition', n: 2 },
   { slug: 'multiplication', dir: '03-multiplication', n: 3 },
   { slug: 'division', dir: '04-division', n: 4 },
+  { slug: 'fractions', dir: '05-fractions', n: 5 },
 ];
 const out = [];
 for (const c of chapters) {
   let md = fs.readFileSync(path.join(SRC, c.dir, 'cours.md'), 'utf8');
   md = md.replace(/<br>$/gm, '<br>').replace(/`(CE1|CE2|CM1|CM2)`/g, '<span class="lv lv-$1">$1</span>');
+  // fractions écrites a/b dans le texte → écriture empilée (hors liens et chemins)
+  md = md.split('\n').map((l) => (l.startsWith('![') ? l : l.replace(/(?<![\w/.])(\d{1,3})\/(\d{1,3})(?![\w/])/g, '<span class="fr"><span class="fr-n">$1</span><span class="fr-d">$2</span></span>'))).join('\n');
   let html = marked.parse(md, { async: false });
   html = html.replace(/src="figures\//g, 'src="figures/');
   html = html.replace(/<hr>/g, '');

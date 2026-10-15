@@ -53,6 +53,63 @@ for (let s = 1; s <= N; s++) for (const p of [1, 2, 3] as Palier[]) {
   for (const lv of divisible.levels) { const d = divisible.generate(lv, p, s); t([2, 5, 10].includes(d.k), 'divisible k ∈ {2,5,10}'); }
   for (const lv of probdiv.levels) { const d = probdiv.generate(lv, p, s); if (d.tpl === 'audessus') { const sol = probdiv.solution(d); t(/page aussi/.test(probdiv.check(d, { ...sol, result: d.inst.answer - 1 }).msg ?? ''), 'probdiv reste → page de plus'); } }
 }
+// chapitre 5 : fractions (contrôles méticuleux)
+import { fracWords } from '../src/engine/frac';
+import { partsegales, colorier, lirefrac } from '../src/exos/frac/figures';
+import { fracdroite, fraclire, egales, fraccomp, entierfrac } from '../src/exos/frac/nombres';
+import { fracsomme, fracquant } from '../src/exos/frac/calculs';
+import { fracpb } from '../src/exos/frac/histoires';
+const FW: [number, number, string][] = [[3, 4, 'trois quarts'], [1, 2, 'un demi'], [3, 2, 'trois demis'], [2, 3, 'deux tiers'], [5, 9, 'cinq neuvièmes'], [1, 5, 'un cinquième'], [7, 12, 'sept douzièmes'], [1, 11, 'un onzième'], [3, 17, 'trois dix-septièmes'], [1, 19, 'un dix-neuvième'], [1, 20, 'un vingtième'], [9, 10, 'neuf dixièmes'], [4, 15, 'quatre quinzièmes'], [1, 60, 'un soixantième']];
+for (const [a, b, w] of FW) t(fracWords(a, b) === w, `mots ${a}/${b} → ${fracWords(a, b)}`);
+const MAXD: Record<string, number> = { CE1: 10, CE2: 12, CM1: 20, CM2: 60 };
+const CE1D = [2, 3, 4, 5, 6, 8, 10];
+const okDen = (lv: string, d: number) => (lv === 'CE1' ? CE1D.includes(d) : d <= MAXD[lv]);
+for (let s = 1; s <= N; s++) for (const p of [1, 2, 3] as Palier[]) {
+  for (const lv of partsegales.levels) {
+    const d = partsegales.generate(lv, p, s);
+    t(okDen(lv, d.b), `partsegales dénominateur ${lv} ${d.b}`);
+    t(d.figs.some((f) => f.kind === 'ok') && d.figs.some((f) => f.kind !== 'ok'), 'partsegales : au moins une bonne et une fausse');
+    for (const f of d.figs) {
+      if (f.kind === 'ok') t(f.b === d.b && f.shade.length === d.a && !f.cuts, 'partsegales ok = parts égales, a grisées');
+      if (f.kind === 'inegal') { const w = f.cuts!.slice(1).map((c, i) => c - f.cuts![i]); t(Math.max(...w) / Math.min(...w) >= 1.99, 'partsegales parts vraiment inégales'); }
+      if (f.kind === 'compte') t(f.shade.length !== d.a && f.b === d.b, 'partsegales compte faux');
+      if (f.kind === 'den') t(f.b !== d.b, 'partsegales dénominateur différent');
+    }
+    if (lv === 'CE1' && p < 3) t(d.a === 1, 'CE1 : fractions unitaires d’abord');
+  }
+  for (const lv of colorier.levels) { const d = colorier.generate(lv, p, s); t(okDen(lv, d.b), 'colorier dénominateur'); if (!lv.startsWith('CM')) t(d.a < d.b, 'colorier ≤ 1 au CE'); t(!colorier.check(d, d.b - d.a).ok || d.b - d.a === d.a, 'colorier refuse le complément'); }
+  for (const lv of lirefrac.levels) {
+    const d = lirefrac.generate(lv, p, s); t(okDen(lv, d.b), 'lirefrac dénominateur');
+    if (d.a !== d.b) t(/inversé/.test(lirefrac.check(d, { n: d.b, d: d.a }).msg ?? ''), 'lirefrac inversion ciblée');
+    if (d.mode === 'fig') t(lirefrac.check(d, { n: 2 * d.a, d: 2 * d.b }).ok, 'lirefrac fraction égale acceptée');
+    t(!lirefrac.check(d, { n: d.a, d: d.b + 1 }).ok, 'lirefrac refuse b+1');
+  }
+  for (const E of [fracdroite, fraclire]) for (const lv of E.levels) { const d = E.generate(lv, p, s); t(d.k % d.b !== 0 && d.U * d.b <= 24 && d.k < d.U * d.b, 'droite fraction non entière, ≤ 24 intervalles'); if (lv === 'CE2') t(d.U === 1, 'CE2 : bande-unité de 0 à 1'); }
+  for (const lv of fraclire.levels) { const d = fraclire.generate(lv, p, s); t(fraclire.check(d, { n: 2 * d.k, d: 2 * d.b }).ok, 'fraclire égale acceptée'); }
+  for (const lv of egales.levels) {
+    const d = egales.generate(lv, p, s); t(d.b * d.k <= MAXD[lv], `egales dénominateur ≤ max ${lv} ${d.b * d.k}`);
+    if (lv === 'CE2') t(d.a < d.b, 'egales ≤ 1 au CE2');
+    if (d.miss === 'n' && d.k > 1) t(/ajouté/.test(egales.check(d, d.a + d.b * d.k - d.b).msg ?? ''), 'egales diagnostic additif');
+    if (d.miss === 'pick') { const g = egales.solution(d) as number[]; t(g.every((i) => d.cards![i].n * d.b === d.a * d.cards![i].d), 'egales cartes justes'); t(g.length < d.cards!.length, 'egales au moins un piège'); }
+  }
+  for (const lv of fraccomp.levels) {
+    const d = fraccomp.generate(lv, p, s); const cross = Math.sign(d.x.n * d.y.d - d.y.n * d.x.d);
+    t(fraccomp.solution(d) === (cross < 0 ? '<' : cross > 0 ? '>' : '='), 'fraccomp signe = produit en croix');
+    t(okDen(lv, d.x.d) && okDen(lv, d.y.d), `fraccomp dénominateurs ${lv} ${d.x.d} ${d.y.d}`);
+    if (lv === 'CE1' || lv === 'CE2') t(d.x.n <= d.x.d && d.y.n <= d.y.d, `fraccomp ≤ 1 au CE ${d.x.n}/${d.x.d} ${d.y.n}/${d.y.d}`);
+    for (const w of ['<', '=', '>']) if (w !== fraccomp.solution(d)) t(!!fraccomp.check(d, w).msg, 'fraccomp message');
+  }
+  for (const lv of fracsomme.levels) {
+    const d = fracsomme.generate(lv, p, s); const g = fracsomme.solution(d);
+    t(g.n > 0 && okDen(lv, g.d), `fracsomme résultat ${lv} ${g.n}/${g.d}`);
+    if (lv === 'CE1' || lv === 'CE2') t(g.n <= g.d, 'fracsomme ≤ 1 au CE');
+    t(fracsomme.check(d, { n: g.n * 3, d: g.d * 3 }).ok, 'fracsomme fraction égale acceptée');
+    if (d.kind === 'add' && d.x.d === d.y.d) t(/dénominateurs/.test(fracsomme.check(d, { n: d.x.n + d.y.n, d: 2 * d.x.d }).msg ?? ''), 'fracsomme ajoute les dénominateurs');
+  }
+  for (const lv of entierfrac.levels) { const d = entierfrac.generate(lv, p, s); const [w, r] = [Math.floor(d.n / d.b), d.n % d.b]; t(w >= 1 && r > 0 && w * d.b + r === d.n, 'entierfrac décomposition'); t(d.b <= MAXD[lv], 'entierfrac dénominateur'); }
+  for (const lv of fracquant.levels) { const d = fracquant.generate(lv, p, s); t(d.n % d.b === 0, 'fracquant tombe juste'); if (lv === 'CM1') t(d.a === 1, 'CM1 : fractions unitaires de quantités'); if (d.a > 1) t(/On en veut/.test(fracquant.check(d, d.n / d.b).msg ?? ''), 'fracquant arrêt au quart'); }
+  for (const lv of fracpb.levels) { const d = fracpb.generate(lv, p, s); const g = fracpb.solution(d); t(g.n > 0 && g.n <= g.d && okDen(lv, g.d), 'fracpb réponse dans (0, 1]'); if (lv === 'CE1') t(p === 3 || d.extra === '', 'fracpb CE1 inutile seulement p3'); }
+}
 console.log(bad.join('\n'));
 console.log(`${pass} vérifications génériques réussies, ${fail} échecs`);
 process.exit(fail ? 1 : 0);

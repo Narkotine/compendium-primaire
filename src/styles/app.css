@@ -170,3 +170,26 @@ table.mini th { font-size: 12px; color: var(--text-2); }
 .sh-p .sh-dots { flex: 1; } .sh-b { display: flex; gap: 4px; } .sh-b .mb { min-width: 44px; min-height: 44px; font-size: 22px; }
 .sh-parts > * { min-width: 0; }
 @media (max-width: 380px) { .sh-parts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* chapitre 5 : fractions */
+.fr { display: inline-flex; flex-direction: column; align-items: center; vertical-align: middle; line-height: 1.05; margin: 0 2px; font-weight: 700; }
+.fr-n { border-bottom: 2.5px solid currentColor; padding: 0 4px; } .fr-d { padding: 0 4px; }
+.eq .fr { font-size: 28px; }
+.ff { display: block; margin: 6px auto; max-width: 100%; height: auto; }
+.ff-p { fill: var(--fig-bg, #fff); stroke: #222; stroke-width: 2; } .ff-p.on { fill: #2a6fbe; }
+.fi { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 8px 0; }
+.fi-frac { display: inline-flex; flex-direction: column; align-items: center; gap: 4px; }
+.fi-b { width: 72px; height: 52px; border-radius: 10px; border: 2px solid var(--border-strong); background: var(--surface); font-size: 26px; font-weight: 700; }
+.fi-b.act { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent); }
+.fi-b.bad { background: color-mix(in srgb, var(--ko) 18%, var(--surface)); border-color: var(--ko); }
+.fi-bar { width: 84px; height: 3px; background: var(--text); border-radius: 2px; }
+.fi-fixed { font-size: 26px; font-weight: 700; min-height: 52px; display: grid; place-items: center; }
+.fi-plus { font-size: 26px; font-weight: 700; } .fi-lab { font-size: 22px; font-weight: 700; }
+.figs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 8px; }
+.figs .tok { min-height: 120px; padding: 6px; width: 100%; } .figs .tok .ff { max-height: 110px; width: auto; }
+.cparts { display: grid; grid-template-columns: repeat(var(--c), minmax(44px, 1fr)); gap: 0; border: 2.5px solid #222; border-radius: 4px; max-width: 340px; margin: 8px auto; }
+.cparts.disc { border: none; }
+.cpart { min-height: 56px; border: 1.5px solid #222; background: var(--fig-bg, #fff); border-radius: 0; }
+.cpart.on { background: #2a6fbe; }
+.cmp { display: flex; justify-content: center; gap: 10px; margin: 10px 0; } .cmp .tok { min-width: 64px; font-size: 30px; }
+.w-figs .pk-c { width: calc(50% - 6px); min-height: 120px; padding: 6px; }
+.w-figs .pk-c .ff { max-height: 110px; width: auto; }
