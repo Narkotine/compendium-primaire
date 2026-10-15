@@ -7,11 +7,7 @@ cd "$(dirname "$0")/.."
 REMOTE=${REMOTE:-origin}
 [ -z "$(git status --porcelain)" ] || { echo "Arbre de travail non propre : commite d'abord les sources." >&2; exit 1; }
 npm run build
-npm test
-if [ -z "${SKIP_TESTS:-}" ] && [ -f scripts/e2e.mts ]; then
-  # e2e optionnel : laisse SKIP_TESTS=1 pour un publish rapide
-  :
-fi
+if [ -z "${SKIP_TESTS:-}" ]; then npm test; fi
 [ -f dist/.nojekyll ] || { echo "dist/.nojekyll manquant" >&2; exit 1; }
 [ -f dist/404.html ] || { echo "dist/404.html manquant" >&2; exit 1; }
 VERSION=$(node -p "require('./package.json').version")
