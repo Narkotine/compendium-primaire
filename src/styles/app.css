@@ -107,3 +107,33 @@ main { max-width: 760px; margin: 0 auto; padding: 12px 12px calc(32px + var(--sa
 .band-c { min-width: 56px; padding: 10px 6px; text-align: center; border: 2px solid var(--border-strong); border-radius: 10px; font-weight: 700; font-size: 18px; background: var(--surface-2); }
 .band-hole { border-style: dashed; border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
 .exo-lv { flex-wrap: wrap; }
+.eq { font-size: 30px; font-weight: 700; text-align: center; margin: 8px 0; }
+.hole { display: inline-block; min-width: 56px; border: 2px dashed var(--accent); border-radius: 10px; color: var(--accent); padding: 0 8px; }
+.pb-text { font-size: 18px; line-height: 1.5; margin: 0 0 8px; }
+/* opération posée */
+.co-meth { display: flex; gap: 6px; margin-bottom: 10px; }
+.co-meth button { flex: 1; min-height: 48px; border-radius: 12px; border: 2px solid var(--border-strong); background: var(--surface-2); font-size: 14px; font-weight: 700; padding: 4px 6px; }
+.co-meth button[aria-checked='true'] { border-color: var(--accent); background: var(--accent-soft); }
+.co-grid { display: grid; gap: 2px; justify-content: center; font-variant-numeric: tabular-nums; }
+.co-r { display: grid; grid-template-columns: 22px repeat(var(--n), 44px); gap: 2px; align-items: center; }
+.co-op { font-size: 26px; font-weight: 700; text-align: center; }
+.co-c { height: 46px; min-width: 0; display: grid; place-items: center; font-size: 28px; font-weight: 700; border-radius: 8px; }
+.co-d { background: transparent; }
+.co-d.struck { text-decoration: line-through; text-decoration-color: var(--ko); opacity: .6; }
+button.co-c { border: 2px solid var(--border-strong); background: var(--surface); padding: 0; }
+.co-small { height: 44px; font-size: 16px; color: var(--ko); border-style: dashed !important; background: transparent !important; }
+.co-big.act, .co-small.act { border-color: var(--accent) !important; box-shadow: 0 0 0 3px var(--accent); }
+.co-big.bad { background: color-mix(in srgb, var(--ko) 18%, var(--surface)); }
+.co-void { height: 44px; }
+.co-line { height: 3px; background: var(--text); margin: 2px 0 2px 24px; border-radius: 2px; }
+.co-help { font-size: 14px; color: var(--text-2); text-align: center; margin: 8px 0; }
+.co-kp { max-width: 340px; margin: 6px auto 0; }
+/* écrire le calcul */
+.ex-line { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; align-items: center; padding: 8px; border-radius: 12px; background: var(--surface-2); }
+.ex-slot { min-height: 56px; border: 2px dashed var(--border-strong); border-radius: 12px; background: var(--surface); display: grid; place-items: center; font-size: 22px; font-weight: 700; padding: 0 6px; }
+.ex-slot.ex-n { min-width: 84px; } .ex-slot.ex-op { min-width: 48px; }
+.ex-slot.over { border-color: var(--accent); background: var(--accent-soft); }
+.ex-slot.no { border-color: var(--ko); }
+.ex-in { cursor: grab; touch-action: none; }
+.ex-pool { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 10px 0 4px; }
+.ex-tok { font-size: 22px; padding: 0 10px; } .ex-tok.ex-op { min-width: 52px; background: var(--accent-soft); }

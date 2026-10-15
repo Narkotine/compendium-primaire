@@ -5,6 +5,11 @@ import { UNITS, MAXN, type Level, type Palier } from '../src/engine/types';
 import { grands } from '../src/exos/grands';
 import { suites, term, noCarry } from '../src/exos/suites';
 import { words } from '../src/engine/words';
+import { complements } from '../src/exos/complements';
+import { mental } from '../src/exos/mental';
+import { addpose, subpose, carries } from '../src/exos/pose';
+import { probadd } from '../src/exos/probadd';
+import { evalExpr } from '../src/ui/expr';
 import { dizaines } from '../src/exos/dizaines';
 import { ranger } from '../src/exos/ranger';
 import { droite, N_INT } from '../src/exos/droite';
@@ -117,6 +122,60 @@ for (const lv of ['CE1', 'CE2'] as Level[]) for (const p of P) for (let s = 1; s
   if (p === 1) t(d.step > 0, `sui p1 croissante ${tag}`);
   const nc = noCarry(term(d, d.hole - 1), d.step);
   if (nc !== null && nc !== term(d, d.hole)) t(/échange/.test(suites.check(d, nc).msg ?? ''), `sui diag sans échange ${tag}`);
+}
+// ---- chapitre 2
+for (const lv of LV4) for (const p of P) for (let s = 1; s <= N; s++) {
+  const tag = `${lv}/p${p}/s${s}`;
+  const c = complements.generate(lv, p, s);
+  t(c.c - c.a > 0 && complements.check(c, c.c - c.a).ok, `com solution ${tag}`);
+  t(/ajouté/.test(complements.check(c, c.c + c.a).msg ?? ''), `com diag addition ${tag}`);
+  const m = mental.generate(lv, p, s);
+  const mr = mental.solution(m);
+  t(mr >= 0 && mental.check(m, mr).ok, `men solution ${tag}`);
+  if (m.kind === 'plus9') t(/ENLEVER/.test(mental.check(m, mr + 2).msg ?? ''), `men diag +9 ${tag}`);
+  if (m.kind === 'plusU') t(m.a % 10 + m.b >= 10, `men plusU franchit la dizaine ${tag}`);
+  if (m.kind === 'moinsU') t(m.a % 10 < m.b, `men moinsU franchit la dizaine ${tag}`);
+  for (const E of [addpose, subpose]) {
+    const d = E.generate(lv, p, s);
+    const v = d.op === '+' ? d.rows.reduce((x, y) => x + y, 0) : d.rows[0] - d.rows[1];
+    const max = { CE1: 999, CE2: 9999, CM1: 99999, CM2: 99999 }[lv];
+    t(v > 0 && v <= max && d.rows.every((x) => x > 0 && x <= max), `${E.id} plage ${tag} ${d.rows}`);
+    const ch = carries(d);
+    t(p === 1 ? ch === 0 : p === 2 ? ch === 1 : ch >= 2, `${E.id} retenues/échanges selon palier ${tag} (${ch})`);
+    t(E.check(d, E.solution(d)).ok, `${E.id} solution ${tag}`);
+    t(Number([...E.solution(d)].reverse().join('')) === v, `${E.id} chiffres ${tag}`);
+    if (d.op === '+' && ch > 0) {
+      const nc = [...Array(String(Math.max(...d.rows)).length + 1).keys()].map((i) => d.rows.reduce((a, x) => a + (Math.floor(x / 10 ** i) % 10), 0) % 10);
+      while (nc.length > 1 && nc[nc.length - 1] === 0) nc.pop();
+      t(/retenues/.test(E.check(d, nc).msg ?? '') || Number([...nc].reverse().join('')) === v, `addpose diag retenue ${tag}`);
+    }
+    if (d.op === '−' && ch > 0) {
+      const len = String(d.rows[0]).length;
+      const ab = [...Array(len).keys()].map((i) => Math.abs((Math.floor(d.rows[0] / 10 ** i) % 10) - (Math.floor(d.rows[1] / 10 ** i) % 10)));
+      while (ab.length > 1 && ab[ab.length - 1] === 0) ab.pop();
+      t(/bas au haut/.test(E.check(d, ab).msg ?? ''), `subpose diag petit-du-grand ${tag}`);
+    }
+    if (d.op === '−' && p === 3) t(/0/.test(String(d.rows[0]).slice(1, -1)), `subpose p3 zéro au milieu ${tag}`);
+  }
+  const pb = probadd.generate(lv, p, s);
+  const sol = probadd.solution(pb);
+  t(evalExpr(sol.nums, sol.ops) === pb.inst.answer, `pb modèle = réponse ${tag} ${pb.tpl}`);
+  t(pb.inst.answer > 0, `pb réponse positive ${tag} ${pb.tpl}`);
+  t(probadd.check(pb, sol).ok, `pb solution acceptée ${tag} ${pb.tpl}`);
+  t(pb.inst.nums.every((x) => pb.inst.text.includes(x.toLocaleString('fr-FR').replace(/\u202f|\s/g, '\u202f')) || pb.inst.text.replace(/\u202f/g, '').includes(String(x))), `pb nombres dans l’énoncé ${tag} ${pb.tpl}`);
+  if (p === 1) t(pb.inst.useless.length === 0, `pb p1 sans donnée inutile ${tag}`);
+  if (pb.inst.useless.length) {
+    const u = pb.inst.useless[0];
+    const wrong = { nums: [pb.inst.nums[0], u], ops: ['+'], result: 0 };
+    if (pb.inst.slots === 2) t(/ne sert pas/.test(probadd.check(pb, wrong).msg ?? ''), `pb diag donnée inutile ${tag}`);
+  }
+  // opération contraire : message ciblé (et jamais acceptée)
+  if (pb.inst.slots === 2) {
+    const flip = { nums: sol.nums, ops: [sol.ops[0] === '+' ? '−' : '+'], result: null };
+    const v = probadd.check(pb, flip);
+    t(!v.ok && !!v.msg, `pb opération contraire refusée ${tag} ${pb.tpl}`);
+  }
+  if (pb.tpl === 'tout' || pb.tpl === 'deplus') { const sw = { nums: [...sol.nums].reverse(), ops: sol.ops, result: pb.inst.answer }; t(probadd.check(pb, sw).ok, `pb addition commutative acceptée ${tag}`); }
 }
 // ---- maîtrise, révisions espacées (localStorage simulé)
 {

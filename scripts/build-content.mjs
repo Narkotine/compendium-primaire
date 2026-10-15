@@ -7,11 +7,14 @@ import { marked } from 'marked';
 
 const ROOT = path.join(path.dirname(fileURLToPath(import.meta.url)), '..');
 const SRC = process.env.COURS_DIR || '/workspace/compendium-primaire';
-const chapters = [{ slug: 'numeration', dir: '01-numeration', n: 1 }];
+const chapters = [
+  { slug: 'numeration', dir: '01-numeration', n: 1 },
+  { slug: 'addition', dir: '02-addition', n: 2 },
+];
 const out = [];
 for (const c of chapters) {
   let md = fs.readFileSync(path.join(SRC, c.dir, 'cours.md'), 'utf8');
-  md = md.replace(/`(CE1|CE2|CM1|CM2)`/g, '<span class="lv lv-$1">$1</span>');
+  md = md.replace(/<br>$/gm, '<br>').replace(/`(CE1|CE2|CM1|CM2)`/g, '<span class="lv lv-$1">$1</span>');
   let html = marked.parse(md, { async: false });
   html = html.replace(/src="figures\//g, 'src="figures/');
   html = html.replace(/<hr>/g, '');
