@@ -14,7 +14,9 @@ export const ranger: ExoType<RanData, number[]> = {
   generate(lv, p, seed) {
     const r = rng(seed);
     const D = NDIG[lv];
-    const k = p === 1 ? 4 : 5;
+    // 4 cartes au plus sur un écran de 360 px ou moins, 5 au-delà
+    const narrow = typeof window !== 'undefined' && window.innerWidth <= 360;
+    const k = p === 1 || narrow ? 4 : 5;
     const rnd = (len: number) => Array.from({ length: len }, () => r.int(0, 9)).join('');
     for (;;) {
       const set = new Set<number>();

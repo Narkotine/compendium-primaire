@@ -4,10 +4,13 @@ import puppeteer, { type Page } from 'puppeteer-core';
 import { echanger } from '../src/exos/echanger';
 import { tableau } from '../src/exos/tableau';
 import { ranger } from '../src/exos/ranger';
-import { droite } from '../src/exos/droite';
+import { droite, lire } from '../src/exos/droite';
 import { dizaines } from '../src/exos/dizaines';
 import { grands } from '../src/exos/grands';
 import { suites, term } from '../src/exos/suites';
+import { addpose, subpose } from '../src/exos/pose';
+import { probadd } from '../src/exos/probadd';
+import { evalExpr } from '../src/ui/expr';
 
 const BASE = process.argv[2] || 'http://localhost:4174/compendium-primaire/';
 const W = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -30,7 +33,7 @@ async function mouseDrag(a: { x: number; y: number }, z: { x: number; y: number 
   await p.mouse.move(a.x, a.y); await p.mouse.down(); await p.mouse.move(z.x, z.y, { steps: 8 }); await p.mouse.up(); await W(120);
 }
 const counts = () => p.$$eval('.mat-col', (cs) => cs.map((c) => Number(c.querySelector('.mat-n')!.textContent)).reverse());
-async function open(h: string) { await p.goto(BASE + h, { waitUntil: 'networkidle0' }); await p.evaluate(() => document.querySelectorAll('.toast').forEach((x) => x.remove())); await W(150); }
+async function open(h: string) { if (p.url() === BASE + h) await p.goto('about:blank'); await p.goto(BASE + h, { waitUntil: 'networkidle0' }); await p.evaluate(() => document.querySelectorAll('.toast').forEach((x) => x.remove())); await W(150); }
 async function typeNumber(n: number) { for (const ch of String(n)) await p.click(`.kp-k[data-k="${ch}"]`); }
 
 console.log('Échanger (CE1, palier 1, graine 7)');
@@ -142,9 +145,9 @@ console.log('Demi-droite (CE1, palier 2) : placer');
 }
 console.log('Demi-droite palier 3 (lire) et dizaines');
 {
-  const g = droite.generate('CE2', 3, 5);
-  await open('#/exo/droite/CE2/3/5');
-  await typeNumber(droite.solution(g)); await p.click('#check'); await W(60);
+  const g = lire.generate('CE2', 3, 5);
+  await open('#/exo/lire/CE2/3/5');
+  await typeNumber(lire.solution(g)); await p.click('#check'); await W(60);
   t((await p.$eval('.fb', (x) => x.textContent || '')).includes('Bravo'), 'lire un point : réponse au pavé');
   const z = dizaines.generate('CE1', 2, 9);
   await open('#/exo/dizaines/CE1/2/9');
@@ -175,8 +178,50 @@ console.log('Réglages : chronomètre désactivé par défaut');
   t(!!(await p.$('.chrono')), 'chrono affiché après activation');
   await open('#/reglages'); await p.click('#chrono'); await W(50);
 }
+console.log('Chapitre 2 : opérations posées et problèmes');
+{
+  const fb = () => p.$eval('.fb', (x) => x.textContent || '');
+  const typeRes = async (n: number) => { for (const ch of [...String(n)].reverse()) await p.click(`.co-kp [data-key="${ch}"]`); };
+  const a = addpose.generate('CE2', 2, 5); const sum = a.rows.reduce((x: number, y: number) => x + y, 0);
+  await open('#/exo/addpose/CE2/2/5');
+  await p.click('.co-small[data-k="1"]'); await p.click('.co-kp [data-key="1"]');
+  await p.click('.co-big[data-k="0"]'); await typeRes(sum - (sum % 10) + ((sum % 10) + 1) % 10); await p.click('#check'); await W(60);
+  t((await p.$$('.co-big.bad')).length === 1, 'addpose : seule la case fausse est en rouge', await p.$$eval('.co-big.bad', (x) => x.length));
+  await p.click('.co-big[data-k="0"]'); await typeRes(sum); await p.click('#check'); await W(60);
+  t((await fb()).includes('Bravo'), 'addpose : résultat saisi de droite à gauche, retenue facultative non notée');
+  for (const m of ['cassage', 'compensation']) {
+    const s2 = subpose.generate('CE2', 3, 8); const diff = s2.rows[0] - s2.rows[1];
+    await open('#/exo/subpose/CE2/3/8');
+    await p.click(`[data-m="${m}"]`); await W(30);
+    t(((await p.$$('[data-row="aux2"]')).length > 0) === (m === 'compensation'), `subpose : méthode ${m} affichée`);
+    await p.click('.co-big[data-k="0"]'); await typeRes(diff); await p.click('#check'); await W(60);
+    t((await fb()).includes('Bravo'), `subpose : méthode ${m} acceptée`);
+  }
+  const lv = 'CE2', P = 3; let seed = 1, d = probadd.generate(lv, P, seed);
+  while (!d.inst.useless.length || d.inst.slots !== 2) d = probadd.generate(lv, P, ++seed);
+  await open(`#/exo/probadd/${lv}/${P}/${seed}`);
+  await p.click('#check'); await W(60);
+  t((await fb()).includes('Écris d’abord'), 'probadd : vérification bloquée sans pénalité tant que le calcul est vide');
+  t((await p.$$eval('.dot.ko, .ko-dot', (x) => x.length)) === 0, 'probadd : aucun point perdu');
+  const tok = async (label: string) => p.evaluate((l) => [...document.querySelectorAll<HTMLElement>('.ex-pool .tok')].findIndex((x) => x.textContent === l && !x.hidden), label);
+  const fmtN = (n: number) => String(n).replace(/\B(?=(\d{3})+(?!\d))/g, '\u202f');
+  // calcul avec la donnée inutile, posé au doigt
+  const iu = await tok(fmtN(d.inst.useless[0]));
+  await touchDrag(await center('.ex-pool .tok', iu), await center('.ex-slot', 0)); await W(80);
+  t((await p.$eval('.ex-slot[data-s="0"]', (x) => x.textContent)) === fmtN(d.inst.useless[0]), 'probadd : glisser au doigt une étiquette dans une case');
+  const sol = probadd.solution(d);
+  // remplacer par la souris puis au toucher-toucher
+  await mouseDrag(await center('.ex-pool .tok', await tok(fmtN(sol.nums[1]))), await center('.ex-slot', 2)); await W(80);
+  await p.click(`.ex-pool .tok:nth-child(${(await tok(sol.ops[0])) + 1})`); await p.click('.ex-slot[data-s="1"]'); await W(50);
+  await typeNumber(1); await p.click('#check'); await W(60);
+  t((await fb()).includes('ne sert pas'), 'probadd : message ciblé sur la donnée inutile', await fb());
+  await open(`#/exo/probadd/${lv}/${P}/${seed}`);
+  for (const [s, v] of [[0, fmtN(sol.nums[0])], [1, sol.ops[0]], [2, fmtN(sol.nums[1])]] as [number, string][]) { await p.click(`.ex-pool .tok:nth-child(${(await tok(v)) + 1})`); await p.click(`.ex-slot[data-s="${s}"]`); await W(40); }
+  await typeNumber(evalExpr(sol.nums, sol.ops)); await p.click('#check'); await W(60);
+  t((await fb()).includes('Bravo'), 'probadd : bon calcul et bon résultat', await fb());
+}
 // cibles ≥ 44 px
-for (const h of ['', '#/reglages', '#/exo/echanger/CE2/2/1', '#/exo/tableau/CE2/3/1', '#/exo/ranger/CE2/3/1', '#/exo/droite/CE1/2/1', '#/exo/droite/CE2/3/1', '#/exo/dizaines/CE2/3/1', '#/exo/droite/CM2/1/3', '#/exo/grands/CM2/3/1', '#/exo/suites/CE2/3/1', '#/exo/ranger/CM2/3/2', '#/cours/numeration']) {
+for (const h of ['', '#/reglages', '#/exo/echanger/CE2/2/1', '#/exo/tableau/CE2/3/1', '#/exo/ranger/CE2/3/1', '#/exo/droite/CE1/2/1', '#/exo/droite/CE2/3/1', '#/exo/dizaines/CE2/3/1', '#/exo/droite/CM2/1/3', '#/exo/grands/CM2/3/1', '#/exo/suites/CE2/3/1', '#/exo/ranger/CM2/3/2', '#/cours/numeration', '#/exo/lire/CE2/2/1', '#/exo/addpose/CM1/3/3', '#/exo/subpose/CM1/3/3', '#/exo/probadd/CM2/3/4', '#/exo/complements/CE2/2/2', '#/exo/mental/CM1/3/2', '#/cours/addition']) {
   for (const w of [360, 390]) {
     await p.setViewport({ width: w, height: 740, isMobile: true, hasTouch: true });
     await open(h);

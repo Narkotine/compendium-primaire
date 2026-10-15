@@ -11,7 +11,7 @@ export interface DroData { lv: Level; p: Palier; start: number; step: number; k:
 export const N_INT = 10;
 const val = (d: DroData, k: number) => d.start + k * d.step;
 
-export const droite: ExoType<DroData, number> = {
+const base: ExoType<DroData, number> = {
   id: 'droite',
   title: 'Placer sur la demi-droite graduée',
   notion: 'La demi-droite graduée',
@@ -29,7 +29,7 @@ export const droite: ExoType<DroData, number> = {
       const labeled = p === 1 ? [0, 1] : [a, a + r.pick([2, 5])];
       const k = r.int(1, N_INT);
       if (labeled.includes(k)) continue;
-      return { lv, p, start, step, k, labeled, mode: p === 3 ? 'lire' : 'placer' };
+      return { lv, p, start, step, k, labeled, mode: 'placer' };
     }
   },
   solution: (d) => (d.mode === 'placer' ? d.k : val(d, d.k)),
@@ -72,4 +72,11 @@ export const droite: ExoType<DroData, number> = {
     const k = keypad(el.querySelector('.w-kp')!, 'Ta réponse');
     return { answer: () => k.value(), lock: () => { k.lock(); nl.lock(); } };
   },
+};
+
+/** Deux exercices séparés : placer un nombre, et lire un point. */
+export const droite: ExoType<DroData, number> = { ...base };
+export const lire: ExoType<DroData, number> = {
+  ...base, id: 'lire', title: 'Lire sur la demi-droite graduée',
+  generate: (lv, p, seed) => ({ ...base.generate(lv, p, seed), mode: 'lire' }),
 };

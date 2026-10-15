@@ -13,7 +13,7 @@ export const CHAPTERS: Chapter[] = [
       { t: 'Les grands nombres', lv: ['CM1', 'CM2'] },
       { t: 'Compter de n en n', lv: ['CE1', 'CE2'] },
     ],
-    exos: ['echanger', 'tableau', 'dizaines', 'ranger', 'droite', 'grands', 'suites'],
+    exos: ['echanger', 'tableau', 'dizaines', 'ranger', 'droite', 'lire', 'grands', 'suites'],
   },
   {
     slug: 'addition', n: 2, title: 'Ajouter et enlever', short: 'Addition, soustraction',
