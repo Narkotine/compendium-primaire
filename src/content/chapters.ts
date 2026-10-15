@@ -97,4 +97,15 @@ export const CHAPTERS: Chapter[] = [
     ],
     exos: ['uniteok', 'convertir', 'monnaie', 'horloge', 'duree', 'perimetre', 'aire', 'probmes'],
   },
+  {
+    slug: 'geometrie', n: 9, title: 'Géométrie', short: 'Géométrie',
+    notions: [
+      { t: 'Se repérer sur un quadrillage', lv: ['CE1', 'CE2'] },
+      { t: 'Les figures', lv: ['CE1', 'CE2', 'CM1'] },
+      { t: 'Angle droit, perpendiculaires, parallèles', lv: ['CE2', 'CM1'] },
+      { t: 'Symétrie axiale', lv: ['CE2', 'CM1'] },
+      { t: 'Les solides', lv: ['CE2', 'CM1'] },
+    ],
+    exos: ['repere', 'figures', 'angle', 'symetrie', 'solides'],
+  },
 ];

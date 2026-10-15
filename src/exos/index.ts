@@ -36,6 +36,7 @@ import { decpose, decfois, decmul } from './dec/calculs';
 import { probdec } from './dec/probdec';
 import { uniteok, convertir, monnaie, horloge } from './mes/base';
 import { duree, perimetre, aire, probmes } from './mes/suite';
+import { figures, angle, symetrie, solides, repere } from './geo/base';
 import type { ExoType } from '../engine/types';
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const EXOS: Record<string, ExoType<any, any>> = { echanger, tableau, dizaines, ranger, droite, lire, grands, suites, complements, mental, addpose, subpose, probadd, rectangle, tables, doubles, fois10, mulpose, multiples, probmul, partage, famille, reste, divpose, divisible, probdiv, partsegales, colorier, lirefrac, fracdroite, fraclire, egales, fraccomp, entierfrac, fracsomme, fracquant, fracpb, probfrac, linmul, linadd, propoupas, probprop, fracvirgule, dectableau, deccomp, decranger, decencadrer, decarrondi, decdroite, declire, decpose, decfois, decmul, probdec, uniteok, convertir, monnaie, horloge, duree, perimetre, aire, probmes };
+export const EXOS: Record<string, ExoType<any, any>> = { echanger, tableau, dizaines, ranger, droite, lire, grands, suites, complements, mental, addpose, subpose, probadd, rectangle, tables, doubles, fois10, mulpose, multiples, probmul, partage, famille, reste, divpose, divisible, probdiv, partsegales, colorier, lirefrac, fracdroite, fraclire, egales, fraccomp, entierfrac, fracsomme, fracquant, fracpb, probfrac, linmul, linadd, propoupas, probprop, fracvirgule, dectableau, deccomp, decranger, decencadrer, decarrondi, decdroite, declire, decpose, decfois, decmul, probdec, uniteok, convertir, monnaie, horloge, duree, perimetre, aire, probmes, figures, angle, symetrie, solides, repere };

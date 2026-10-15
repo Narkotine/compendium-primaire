@@ -6,7 +6,7 @@ body { font-size: 18px; }
 .bar-t { flex: 1; margin: 0; font-size: 19px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .ib { min-width: 48px; height: 48px; display: grid; place-items: center; border: 0; border-radius: 12px; background: transparent; font-size: 24px; color: var(--text); text-decoration: none; }
 .ib:active { background: var(--surface-2); }
-.logo { width: 36px; height: 36px; margin: 6px; border-radius: 10px; background: url(/icons/favicon.svg) center/cover; }
+.logo { width: 44px; height: 44px; margin: 6px; border-radius: 10px; background: url(/icons/favicon.svg) center/cover; }
 main { max-width: 760px; margin: 0 auto; padding: 12px 12px calc(32px + var(--safe-b)); }
 .card { background: var(--surface); border: 1px solid var(--border); border-radius: var(--radius); padding: 14px; margin: 12px 0; box-shadow: var(--shadow-1); }
 .card h2 { margin: 0 0 10px; font-size: 21px; }
@@ -39,7 +39,7 @@ main { max-width: 760px; margin: 0 auto; padding: 12px 12px calc(32px + var(--sa
 .mat { display: grid; grid-template-columns: repeat(var(--n, 3), 1fr); gap: 6px; } .mat-4 { --n: 4; } .mat-3 { --n: 3; }
 .mat-col { border: 2px dashed var(--border-strong); border-radius: 12px; padding: 6px; display: flex; flex-direction: column; min-height: 200px; background: var(--surface); transition: background .15s; }
 .mat-col.over { background: var(--accent-soft); border-color: var(--accent); }
-.mat-h { font-size: 14px; text-align: center; line-height: 1.2; min-height: 36px; } .mat-n { font-size: 22px; display: block; }
+.mat-h { font-size: 14px; text-align: center; line-height: 1.2; min-height: 44px; } .mat-n { font-size: 22px; display: block; }
 .mat-pieces { flex: 1; display: flex; flex-wrap: wrap; gap: 3px; align-content: flex-start; justify-content: center; padding: 4px 0; }
 .pc { display: block; border-radius: 2px; cursor: grab; touch-action: none; }
 .pc-u { width: 16px; height: 16px; background: var(--u); box-shadow: inset 0 0 0 1px #7a5a10; }
@@ -83,7 +83,7 @@ main { max-width: 760px; margin: 0 auto; padding: 12px 12px calc(32px + var(--sa
 .toasts { position: fixed; left: 0; right: 0; bottom: calc(12px + var(--safe-b)); display: grid; justify-items: center; gap: 8px; z-index: 60; pointer-events: none; }
 .toast { pointer-events: auto; display: flex; gap: 12px; align-items: center; background: var(--text); color: var(--bg); padding: 10px 14px; border-radius: 12px; font-size: 15px; max-width: 92vw; }
 .toast-btn { min-height: 44px; border: 0; border-radius: 10px; background: var(--accent); color: var(--on-accent); font-weight: 700; padding: 0 12px; }
-@media (max-width: 380px) { .mat-h { font-size: 12.5px; } .mb { font-size: 12.5px; } .pc-c { width: 36px; height: 36px; } }
+@media (max-width: 380px) { .mat-h { font-size: 12.5px; } .mb { font-size: 12.5px; } .pc-c { width: 44px; height: 44px; } }
 .card h3 { margin: 16px 0 4px; font-size: 18px; }
 .due { color: #b86e00; font-weight: 700; margin-left: 2px; }
 .due-card { border-color: #e0a21b; } .due-l { display: flex; flex-wrap: wrap; gap: 8px; }
@@ -224,3 +224,12 @@ table.mini th { font-size: 12px; color: var(--text-2); }
 .clk { width: 100%; max-width: 220px; height: auto; display: block; margin: 12px auto; }
 .aire-fig { display: block; margin: 12px auto; background: var(--fig-bg); border-radius: 8px; }
 .enc-h.bad { border-color: var(--ko); background: color-mix(in srgb, var(--ko) 18%, var(--surface)); }
+
+.sy { display: grid; grid-template-columns: repeat(var(--n), 44px); gap: 0; justify-content: center; margin: 12px auto; border: 2px solid var(--border-strong); width: max-content; position: relative; }
+.sy-c { width: 44px; height: 44px; min-width: 44px; min-height: 44px; border: 1px solid var(--border); background: var(--surface); padding: 0; font-size: 14px; }
+.sy-c.on { background: #2a6fbe; }
+.sy-c.given { background: #1a4a7a; color: #fff; }
+.sy-c.start { background: #d1495b; color: #fff; font-weight: 700; }
+.sy-c.sel { outline: 3px solid var(--accent); outline-offset: -3px; }
+.sy[data-axis="V"] { background: linear-gradient(to right, transparent calc(50% - 1.5px), #d1495b calc(50% - 1.5px), #d1495b calc(50% + 1.5px), transparent calc(50% + 1.5px)); }
+.sy[data-axis="H"] { background: linear-gradient(to bottom, transparent calc(50% - 1.5px), #d1495b calc(50% - 1.5px), #d1495b calc(50% + 1.5px), transparent calc(50% + 1.5px)); }
