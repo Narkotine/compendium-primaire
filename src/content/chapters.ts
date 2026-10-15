@@ -39,4 +39,15 @@ export const CHAPTERS: Chapter[] = [
     ],
     exos: ['probmul', 'rectangle', 'tables', 'doubles', 'fois10', 'mulpose', 'multiples'],
   },
+  {
+    slug: 'division', n: 4, title: 'Partager et diviser', short: 'Division',
+    notions: [
+      { t: 'Deux sens : partager, faire des groupes', lv: ['CE1', 'CE2'] },
+      { t: 'La division et les tables', lv: ['CE2', 'CM1', 'CM2'] },
+      { t: 'Le reste', lv: ['CE2', 'CM1', 'CM2'] },
+      { t: 'La division posée', lv: ['CM1', 'CM2'] },
+      { t: 'Divisible par 2, 5, 10', lv: ['CM1', 'CM2'] },
+    ],
+    exos: ['probdiv', 'partage', 'famille', 'reste', 'divpose', 'divisible'],
+  },
 ];

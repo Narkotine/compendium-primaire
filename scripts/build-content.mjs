@@ -11,6 +11,7 @@ const chapters = [
   { slug: 'numeration', dir: '01-numeration', n: 1 },
   { slug: 'addition', dir: '02-addition', n: 2 },
   { slug: 'multiplication', dir: '03-multiplication', n: 3 },
+  { slug: 'division', dir: '04-division', n: 4 },
 ];
 const out = [];
 for (const c of chapters) {

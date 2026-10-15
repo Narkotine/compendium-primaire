@@ -33,6 +33,26 @@ for (let s = 1; s <= N; s++) for (const p of [1, 2, 3] as Palier[]) {
   for (const lv of multiples.levels) { const d = multiples.generate(lv, p, s); const g = multiples.solution(d); t(g.length >= 2 && g.length <= 4 && d.cards.length === 6, `multiples 2–4 bons ${lv}`); const dv = d.cards.findIndex((n) => d.k % n === 0 && n < d.k); if (dv >= 0) t(/pas un multiple/.test(multiples.check(d, [...g, dv]).msg!), `multiples piège diviseur ${lv}`); }
   for (const lv of probmul.levels) { const d = probmul.generate(lv, p, s); if (d.inst.slots === 2 && d.tpl !== 'deplus') { const v = probmul.check(d, { nums: d.inst.nums, ops: ['+'], result: null }); t(!v.ok && !!v.msg, `probmul + refusé ${lv} ${d.tpl}`); } if (lv === 'CE1') t(p === 3 || !d.inst.useless.length, `probmul CE1 inutile seulement p3`); }
 }
+// chapitre 4
+import { divpose, steps } from '../src/exos/divpose';
+import { reste } from '../src/exos/reste';
+import { partage } from '../src/exos/partage';
+import { probdiv } from '../src/exos/probdiv';
+import { divisible } from '../src/exos/divisible';
+for (let s = 1; s <= N; s++) for (const p of [1, 2, 3] as Palier[]) {
+  for (const lv of divpose.levels) {
+    const d = divpose.generate(lv, p, s); const st = steps(d);
+    t(st.reduce((q, x) => q * 10 + x.q, 0) === Math.floor(d.n / d.d) && st[st.length - 1].r === d.n % d.d, `divpose étapes = division ${d.n}/${d.d}`);
+    t(st.every((x) => x.r < d.d), `divpose restes < diviseur`);
+    const z = st.findIndex((x, i) => i > 0 && x.q === 0);
+    if (p === 3) { t(z > 0, `divpose p3 a un 0 au quotient ${d.n}/${d.d}`); const a = divpose.solution(d); a.splice(2 * z, 2); const w = [...a.slice(0, 2 * z), 1, st[z].r, ...a.slice(2 * z)]; t(/mets 0/.test(divpose.check(d, w).msg ?? ''), `divpose message zéro ${d.n}/${d.d}`); }
+    const a = divpose.solution(d); a[0] = (a[0] as number) + 1; t(!divpose.check(d, a).ok, `divpose refuse q+1`);
+  }
+  for (const lv of reste.levels) { const d = reste.generate(lv, p, s); const q = Math.floor(d.n / d.d), r = d.n % d.d; if (q > 0) t(/plus grand que/.test(reste.check(d, [q - 1, r + d.d]).msg ?? ''), `reste ≥ diviseur ${lv}`); t(!reste.check(d, [q, r + 1]).ok, `reste refuse r+1`); }
+  for (const lv of partage.levels) { const d = partage.generate(lv, p, s); const c = partage.solution(d).counts; c[0]++; t(/pas égales/.test(partage.check(d, { counts: c, left: d.n % d.k - 1 }).msg ?? ''), `partage inégal ${lv}`); if (p === 3) t(d.n % d.k > 0, 'partage p3 avec reste'); }
+  for (const lv of divisible.levels) { const d = divisible.generate(lv, p, s); t([2, 5, 10].includes(d.k), 'divisible k ∈ {2,5,10}'); }
+  for (const lv of probdiv.levels) { const d = probdiv.generate(lv, p, s); if (d.tpl === 'audessus') { const sol = probdiv.solution(d); t(/page aussi/.test(probdiv.check(d, { ...sol, result: d.inst.answer - 1 }).msg ?? ''), 'probdiv reste → page de plus'); } }
+}
 console.log(bad.join('\n'));
 console.log(`${pass} vérifications génériques réussies, ${fail} échecs`);
 process.exit(fail ? 1 : 0);

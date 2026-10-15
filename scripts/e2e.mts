@@ -14,6 +14,8 @@ import { evalExpr } from '../src/ui/expr';
 import { mulpose, partials } from '../src/exos/mulpose';
 import { multiples } from '../src/exos/multiples';
 import { rectangle } from '../src/exos/rectangle';
+import { partage } from '../src/exos/partage';
+import { divpose, steps } from '../src/exos/divpose';
 
 const BASE = process.argv[2] || 'http://localhost:4174/compendium-primaire/';
 const W = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -252,13 +254,36 @@ console.log('Chapitre 3 : multiplication');
   await typeNumber(r.r + r.c); await p.click('#check'); await W(60);
   t((await fb()).includes('Tu as ajouté'), 'rectangle : addition au lieu de multiplication → message ciblé', await fb());
 }
+console.log('Chapitre 4 : division');
+{
+  const fb = () => p.$eval('.fb', (x) => x.textContent || '');
+  const d = partage.generate('CE1', 1, 2);
+  await open('#/exo/partage/CE1/1/2');
+  await p.click('.sh-p [data-i="0"][data-d="1"]'); await p.click('.sh-p [data-i="0"][data-d="1"]');
+  await p.click('#check'); await W(60);
+  t((await fb()).includes('pas égales') && (await p.$$('.sh-p.bad')).length >= 1, 'partage : parts inégales → message et parts en rouge', await fb());
+  await p.click('.sh-p [data-i="0"][data-d="-1"]'); await p.click('.sh-p [data-i="0"][data-d="-1"]');
+  for (let i = 0; i < d.n / d.k; i++) await p.click('.sh-all');
+  t(await p.$eval('.sh-n', (x) => x.textContent) === '0', 'partage : « Un à chacun » distribue tout');
+  await p.click('#check'); await W(60);
+  t((await fb()).includes('Bravo'), 'partage : partage équitable accepté au 2e essai');
+  const v = divpose.generate('CM1', 3, 1); const st = steps(v); const sol = divpose.solution(v);
+  await open('#/exo/divpose/CM1/3/1');
+  const z = st.findIndex((x, i) => i > 0 && x.q === 0);
+  for (let i = 0; i < sol.length; i++) { await p.click(`.ln-f[data-i="${i}"]`); for (const ch of String(i === 2 * z ? 1 : sol[i])) await p.click(`.co-kp [data-key="${ch}"]`); }
+  await p.click('#check'); await W(60);
+  t((await fb()).includes('mets 0'), 'divpose : 0 oublié au quotient → message ciblé', await fb());
+  await p.click(`.ln-f[data-i="${2 * z}"]`); await p.click('.co-kp [data-key="del"]'); await p.click('.co-kp [data-key="0"]');
+  await p.click('#check'); await W(60);
+  t((await fb()).includes('Bravo'), 'divpose : étapes justes acceptées');
+}
 // cibles ≥ 44 px
-for (const h of ['', '#/reglages', '#/exo/echanger/CE2/2/1', '#/exo/tableau/CE2/3/1', '#/exo/ranger/CE2/3/1', '#/exo/droite/CE1/2/1', '#/exo/droite/CE2/3/1', '#/exo/dizaines/CE2/3/1', '#/exo/droite/CM2/1/3', '#/exo/grands/CM2/3/1', '#/exo/suites/CE2/3/1', '#/exo/ranger/CM2/3/2', '#/cours/numeration', '#/exo/lire/CE2/2/1', '#/exo/addpose/CM1/3/3', '#/exo/subpose/CM1/3/3', '#/exo/probadd/CM2/3/4', '#/exo/complements/CE2/2/2', '#/exo/mental/CM1/3/2', '#/cours/addition', '#/cours/multiplication', '#/exo/mulpose/CM2/3/1', '#/exo/mulpose/CE2/1/1', '#/exo/multiples/CM1/3/2', '#/exo/rectangle/CE2/3/1', '#/exo/tables/CE2/3/1', '#/exo/fois10/CM2/3/1', '#/exo/doubles/CE1/3/1', '#/exo/probmul/CM2/3/5']) {
+for (const h of ['', '#/reglages', '#/exo/echanger/CE2/2/1', '#/exo/tableau/CE2/3/1', '#/exo/ranger/CE2/3/1', '#/exo/droite/CE1/2/1', '#/exo/droite/CE2/3/1', '#/exo/dizaines/CE2/3/1', '#/exo/droite/CM2/1/3', '#/exo/grands/CM2/3/1', '#/exo/suites/CE2/3/1', '#/exo/ranger/CM2/3/2', '#/cours/numeration', '#/exo/lire/CE2/2/1', '#/exo/addpose/CM1/3/3', '#/exo/subpose/CM1/3/3', '#/exo/probadd/CM2/3/4', '#/exo/complements/CE2/2/2', '#/exo/mental/CM1/3/2', '#/cours/addition', '#/cours/multiplication', '#/exo/mulpose/CM2/3/1', '#/exo/mulpose/CE2/1/1', '#/exo/multiples/CM1/3/2', '#/exo/rectangle/CE2/3/1', '#/exo/tables/CE2/3/1', '#/exo/fois10/CM2/3/1', '#/exo/doubles/CE1/3/1', '#/exo/probmul/CM2/3/5', '#/cours/division', '#/exo/partage/CE2/2/3', '#/exo/divpose/CM2/3/2', '#/exo/reste/CM1/2/1', '#/exo/famille/CE2/1/1', '#/exo/divisible/CM2/3/1', '#/exo/probdiv/CM1/3/2']) {
   for (const w of [360, 390]) {
     await p.setViewport({ width: w, height: 740, isMobile: true, hasTouch: true });
     await open(h);
     const small = await p.$$eval('button, a, input', (els) => els.filter((e) => { const r = (e.closest('label') ?? e).getBoundingClientRect(); return r.width > 0 && (r.width < 44 || r.height < 44); }).map((e) => e.className || e.tagName));
-    const overflow = await p.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1);
+    const overflow = await p.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1 || [...document.querySelectorAll('main *')].some((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && r.right > innerWidth + 1 && !e.closest('.table-wrap, .md table, pre'); }));
     t(small.length === 0 && !overflow, `cibles ≥ 44 px, pas de débordement : ${h || 'accueil'} à ${w} px`, { small, overflow });
   }
 }

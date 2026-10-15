@@ -16,7 +16,13 @@ import { fois10 } from './fois10';
 import { mulpose } from './mulpose';
 import { multiples } from './multiples';
 import { probmul } from './probmul';
+import { partage } from './partage';
+import { famille } from './famille';
+import { reste } from './reste';
+import { divpose } from './divpose';
+import { divisible } from './divisible';
+import { probdiv } from './probdiv';
 import type { ExoType } from '../engine/types';
 /** Exercices du chapitre 1, dans l'ordre des notions du cours. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const EXOS: Record<string, ExoType<any, any>> = { echanger, tableau, dizaines, ranger, droite, lire, grands, suites, complements, mental, addpose, subpose, probadd, rectangle, tables, doubles, fois10, mulpose, multiples, probmul };
+export const EXOS: Record<string, ExoType<any, any>> = { echanger, tableau, dizaines, ranger, droite, lire, grands, suites, complements, mental, addpose, subpose, probadd, rectangle, tables, doubles, fois10, mulpose, multiples, probmul, partage, famille, reste, divpose, divisible, probdiv };

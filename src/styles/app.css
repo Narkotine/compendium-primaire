@@ -158,3 +158,15 @@ button.co-c { border: 2px solid var(--border-strong); background: var(--surface)
 table.mini { border-collapse: collapse; margin: 6px auto; font-variant-numeric: tabular-nums; }
 table.mini th, table.mini td { border: 1px solid var(--border-strong); min-width: 30px; padding: 2px 6px; text-align: center; font-size: 18px; }
 table.mini th { font-size: 12px; color: var(--text-2); }
+/* chapitre 4 : partage */
+.sh-pool { text-align: center; font-size: 16px; margin-bottom: 6px; } .sh-n { font-size: 26px; font-weight: 700; }
+.sh-dots { display: flex; flex-wrap: wrap; gap: 3px; justify-content: center; padding: 4px; min-height: 18px; }
+.sh-dots i { width: 12px; height: 12px; border-radius: 50%; background: var(--accent); display: block; }
+.sh-all { display: block; margin: 4px auto 10px; }
+.sh-parts { display: grid; grid-template-columns: repeat(var(--c), minmax(0, 1fr)); gap: 6px; }
+.sh-p { border: 2px dashed var(--border-strong); border-radius: 12px; padding: 6px; background: var(--surface); display: flex; flex-direction: column; align-items: center; }
+.sh-p.bad { border-color: var(--ko); background: color-mix(in srgb, var(--ko) 12%, var(--surface)); }
+.sh-h { font-size: 13px; color: var(--text-2); } .sh-v { font-size: 22px; font-weight: 700; }
+.sh-p .sh-dots { flex: 1; } .sh-b { display: flex; gap: 4px; } .sh-b .mb { min-width: 44px; min-height: 44px; font-size: 22px; }
+.sh-parts > * { min-width: 0; }
+@media (max-width: 380px) { .sh-parts { grid-template-columns: repeat(2, minmax(0, 1fr)); } }

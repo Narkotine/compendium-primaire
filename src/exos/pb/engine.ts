@@ -24,6 +24,10 @@ export interface PbInst {
   /** diagnostic d'un calcul faux (nombres utiles bien choisis), ou null */
   diag?: (nums: number[], ops: string[]) => string | null;
   hint: string;
+  /** valeur du bon calcul quand elle diffère de la réponse (division avec reste : 189 ÷ 10 = 18,9 → 19 pages) */
+  exprValue?: number;
+  /** diagnostic d'un résultat faux (calcul juste) */
+  resDiag?: (x: number) => string | null;
   /** calcul attendu, pour le corrigé (ex. « 83 + 18 − 27 ») */
   model: string;
 }
@@ -56,7 +60,7 @@ export function makeProblemExo(id: string, title: string, notion: string, levels
     if (usedUseless.length) return { ok: false, msg: `Le nombre ${fmt(usedUseless[0])} ne sert pas à répondre à la question. Relis ce qu’on cherche.` };
     if (!sameMultiset(a.nums, i.nums)) return { ok: false, msg: `Utilise tous les nombres utiles de l’énoncé, chacun une fois.` };
     const v = evalExpr(a.nums, a.ops);
-    if (v === i.answer) return { ok: true };
+    if (Math.abs(v - (i.exprValue ?? i.answer)) < 1e-9) return { ok: true };
     if (v < 0) return { ok: false, msg: `Ce calcul est impossible : on ne peut pas enlever un grand nombre d’un plus petit. Mets le plus grand en premier.` };
     return { ok: false, msg: i.diag?.(a.nums, a.ops) ?? `Ce calcul ne répond pas à la question. Imagine la situation : la quantité cherchée est-elle plus grande ou plus petite ?` };
   };
@@ -70,10 +74,12 @@ export function makeProblemExo(id: string, title: string, notion: string, levels
       if (!ph.ok) return { ok: false, msg: ph.msg };
       if (a.result === null) return { ok: false, msg: 'Le calcul est juste ! Maintenant, calcule le résultat.' };
       if (a.result === d.inst.answer) return { ok: true };
+      const rd = d.inst.resDiag?.(a.result);
+      if (rd) return { ok: false, msg: rd };
       return { ok: false, msg: `Ton calcul est bien choisi, mais le résultat n’est pas juste. Refais l’opération (tu peux la poser).` };
     },
     hint: (d) => d.inst.hint,
-    correction: (d) => `<p>Calcul : <b>${d.inst.model} = ${fmt(d.inst.answer)}</b></p><p>Réponse : ${fmt(d.inst.answer)} ${d.inst.unit}.</p>${d.inst.useless.length ? `<p class="small">${d.inst.useless.map(fmt).join(', ')} ne servai${d.inst.useless.length > 1 ? 'ent' : 't'} à rien.</p>` : ''}`,
+    correction: (d) => `<p>Calcul : <b>${d.inst.model}${d.inst.exprValue === undefined ? ` = ${fmt(d.inst.answer)}` : ''}</b></p><p>Réponse : ${fmt(d.inst.answer)} ${d.inst.unit}.</p>${d.inst.useless.length ? `<p class="small">${d.inst.useless.map(fmt).join(', ')} ne servai${d.inst.useless.length > 1 ? 'ent' : 't'} à rien.</p>` : ''}`,
     mount(el, d) {
       const i = d.inst;
       const all = [...new Set([...i.nums, ...i.useless])];
