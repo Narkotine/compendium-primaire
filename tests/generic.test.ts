@@ -123,6 +123,7 @@ for (let s = 1; s <= N; s++) for (const p of [1, 2, 3] as Palier[]) {
 import { deccomp, decranger, decencadrer, decarrondi } from '../src/exos/dec/comparer';
 import { fracvirgule, dectableau } from '../src/exos/dec/ecriture';
 import { decpose, decfois, decmul } from '../src/exos/dec/calculs';
+import { decdiv } from '../src/exos/dec/divdec';
 import { decdroite, declire } from '../src/exos/dec/droite';
 import { probdec } from '../src/exos/dec/probdec';
 import { fmtDec, fromParts, cmp } from '../src/engine/dec';
@@ -181,6 +182,16 @@ for (let s = 1; s <= N; s++) for (const p of [1, 2, 3] as Palier[]) {
     if (lv === 'CM1') t(d.k <= 9, 'CM1 : entier < 10');
     const noComma = String(Math.abs(d.d.n) * d.k);
     if (d.d.s > 0) t(/virgule/.test(decmul.check(d, noComma).msg ?? ''), 'decmul oubli virgule');
+  }
+  for (const lv of decdiv.levels) {
+    const d = decdiv.generate(lv, p, s);
+    t(decdiv.check(d, decdiv.solution(d)).ok, `decdiv sol ${lv} p${p} s${s}`);
+    t(d.den >= 2 && d.den <= 9, 'decdiv diviseur 1 chiffre');
+    const intOnly = String(Math.trunc(Math.abs((d.num.n / 10 ** d.num.s) / d.den)));
+    // approximate - better use solution int part
+    const sol = decdiv.solution(d);
+    const ip = sol.split(',')[0].replace(/\u202f/g, '');
+    if (sol.includes(',')) t(/virgule|reste|continue/i.test(decdiv.check(d, ip).msg ?? ''), 'decdiv arrêt avant virgule');
   }
   for (const lv of probdec.levels) {
     const d = probdec.generate(lv, p, s);

@@ -88,28 +88,38 @@ export const angle: ExoType<AnData, number[]> = {
 };
 
 /* ---------- symetrie ---------- */
-export interface SyData { lv: Level; p: Palier; cells: boolean[][]; axis: 'V' | 'H'; missing: [number, number][] }
+export interface SyData { lv: Level; p: Palier; cells: boolean[][]; axis: 'V' | 'H' | 'D' | 'A'; missing: [number, number][] }
+/** D = diagonale principale (i=j), A = anti-diagonale (i+j=N-1). Programme CM2 seulement. */
 export const symetrie: ExoType<SyData, [number, number][]> = {
-  id: 'symetrie', title: 'Compléter une symétrie', notion: 'Symétrie axiale', levels: ['CE2', 'CM1'],
+  id: 'symetrie', title: 'Compléter une symétrie', notion: 'Symétrie axiale', levels: ['CE2', 'CM1', 'CM2'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const N = 6;
-    const axis: 'V' | 'H' = r.next() < 0.5 ? 'V' : 'H';
+    let axis: 'V' | 'H' | 'D' | 'A';
+    if (lv === 'CM2' && p >= 2 && r.next() < 0.55) axis = r.pick(['D', 'A'] as const);
+    else axis = r.pick(['V', 'H'] as const);
     const cells = Array.from({ length: N }, () => Array(N).fill(false) as boolean[]);
-    // paint a few cells on one side
     const painted: [number, number][] = [];
     const count = r.int(2, p === 3 ? 5 : 3);
-    while (painted.length < count) {
-      const i = r.int(0, N - 1), j = axis === 'V' ? r.int(0, 2) : r.int(0, N - 1);
-      const jj = axis === 'V' ? j : r.int(0, 2);
-      const ii = axis === 'V' ? i : j;
-      const x = axis === 'V' ? ii : jj, y = axis === 'V' ? jj : ii;
-      if (cells[x][y]) continue;
-      cells[x][y] = true; painted.push([x, y]);
+    const mirror = (i: number, j: number): [number, number] => {
+      if (axis === 'V') return [i, N - 1 - j];
+      if (axis === 'H') return [N - 1 - i, j];
+      if (axis === 'D') return [j, i];
+      return [N - 1 - j, N - 1 - i]; // A
+    };
+    let guard = 200;
+    while (painted.length < count && guard-- > 0) {
+      let i = r.int(0, N - 1), j = r.int(0, N - 1);
+      if (axis === 'V' && j >= N / 2) j = r.int(0, 2);
+      if (axis === 'H' && i >= N / 2) i = r.int(0, 2);
+      if (axis === 'D') { i = r.int(0, N - 2); j = r.int(i + 1, N - 1); }
+      if (axis === 'A') { i = r.int(0, N - 2); j = r.int(0, N - 2 - i); }
+      const [mi, mj] = mirror(i, j);
+      if (i === mi && j === mj) continue;
+      if (cells[i][j]) continue;
+      cells[i][j] = true; painted.push([i, j]);
     }
-    // mirrors that should exist
-    const missing: [number, number][] = painted.map(([i, j]) => axis === 'V' ? [i, N - 1 - j] as [number, number] : [N - 1 - i, j] as [number, number]);
-    // at palier 1, show nothing on the other side; at p2/3 leave all missing
+    const missing: [number, number][] = painted.map(([i, j]) => mirror(i, j));
     return { lv, p, cells, axis, missing };
   },
   solution: (d) => d.missing,
@@ -121,14 +131,14 @@ export const symetrie: ExoType<SyData, [number, number][]> = {
     if (extra.length) return { ok: false, msg: `Une case de trop. Chaque point a un jumeau à la même distance de l’autre côté de l’axe.` };
     return { ok: false, msg: `Il manque des cases. Compte les cases depuis l’axe, de chaque côté.` };
   },
-  hint: (d) => `L’axe est ${d.axis === 'V' ? 'vertical' : 'horizontal'}. Pour chaque case coloriée, colorie son jumeau.`,
+  hint: (d) => `L’axe est ${d.axis === 'V' ? 'vertical' : d.axis === 'H' ? 'horizontal' : d.axis === 'D' ? 'la diagonale (coin haut-gauche → bas-droite)' : 'la diagonale (coin haut-droite → bas-gauche)'}. Pour chaque case coloriée, colorie son jumeau.`,
   correction: (d) => `<p>Cases à colorier : ${d.missing.map(([i, j]) => `(${i + 1},${j + 1})`).join(', ')}.</p>`,
   mount(el, d) {
     const N = d.cells.length;
     const mid = N / 2;
     let on = d.missing.map(() => false);
     // user toggles missing cells only (the ones to complete); show given cells locked
-    el.innerHTML = `<p class="q">Complète la figure pour qu’elle soit symétrique par rapport à l’axe ${d.axis === 'V' ? 'vertical' : 'horizontal'}.</p>
+    el.innerHTML = `<p class="q">Complète la figure pour qu’elle soit symétrique par rapport à l’axe ${d.axis === 'V' ? 'vertical' : d.axis === 'H' ? 'horizontal' : 'diagonal'}.</p>
       <div class="sy" style="--n:${N}" role="grid">${d.cells.map((row, i) => row.map((c, j) => {
         const isMiss = d.missing.some(([x, y]) => x === i && y === j);
         // axis line between mid-1 and mid

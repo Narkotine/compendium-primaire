@@ -22,6 +22,7 @@ import { linmul, propoupas } from '../src/exos/prop';
 import { divpose, steps } from '../src/exos/divpose';
 import { deccomp } from '../src/exos/dec/comparer';
 import { decpose, decfois } from '../src/exos/dec/calculs';
+import { decdiv } from '../src/exos/dec/divdec';
 import { fracvirgule } from '../src/exos/dec/ecriture';
 import { fmtDec } from '../src/engine/dec';
 import { uniteok, convertir } from '../src/exos/mes/base';
@@ -390,6 +391,20 @@ console.log('Chapitre 6 : décimaux');
   for (const ch of fake) await p.click(`.kp-k[data-k="${ch === ',' ? ',' : ch}"]`);
   await p.click('#check'); await W(60);
   t(/zéro|glissent|rang/i.test(await fb()), 'decfois : « ajouter un zéro » → message', await fb());
+  const dd = decdiv.generate('CM2', 1, 4);
+  await open('#/exo/decdiv/CM2/1/4');
+  const sol = decdiv.solution(dd).replace(/\u202f/g, '');
+  const ip = sol.split(',')[0];
+  for (const ch of ip) await p.click(`.kp-k[data-k="${ch}"]`);
+  await p.click('#check'); await W(60);
+  t(/virgule|reste|continue/i.test(await fb()), 'decdiv : arrêt à l’entier → message', await fb());
+  for (let i = 0; i < 10; i++) await p.click('.kp-k[data-k="del"]');
+  for (const ch of sol) {
+    if (ch === ' ') continue;
+    await p.click(`.kp-k[data-k="${ch}"]`);
+  }
+  await p.click('#check'); await W(60);
+  t((await fb()).includes('Bravo'), 'decdiv : quotient décimal accepté');
 }
 console.log('Chapitre 8 : mesures');
 {
@@ -433,7 +448,7 @@ console.log('Chapitre 9 : géométrie');
   } else t(true, 'solides : forme nom (sautée)');
 }
 // cibles ≥ 44 px
-for (const h of ['', '#/reglages', '#/exo/echanger/CE2/2/1', '#/exo/tableau/CE2/3/1', '#/exo/ranger/CE2/3/1', '#/exo/droite/CE1/2/1', '#/exo/droite/CE2/3/1', '#/exo/dizaines/CE2/3/1', '#/exo/droite/CM2/1/3', '#/exo/grands/CM2/3/1', '#/exo/suites/CE2/3/1', '#/exo/ranger/CM2/3/2', '#/cours/numeration', '#/exo/lire/CE2/2/1', '#/exo/addpose/CM1/3/3', '#/exo/subpose/CM1/3/3', '#/exo/probadd/CM2/3/4', '#/exo/complements/CE2/2/2', '#/exo/mental/CM1/3/2', '#/cours/addition', '#/cours/multiplication', '#/exo/mulpose/CM2/3/1', '#/exo/mulpose/CE2/1/1', '#/exo/multiples/CM1/3/2', '#/exo/rectangle/CE2/3/1', '#/exo/tables/CE2/3/1', '#/exo/fois10/CM2/3/1', '#/exo/doubles/CE1/3/1', '#/exo/probmul/CM2/3/5', '#/cours/division', '#/exo/partage/CE2/2/3', '#/exo/divpose/CM2/3/2', '#/exo/reste/CM1/2/1', '#/exo/famille/CE2/1/1', '#/exo/divisible/CM2/3/1', '#/exo/probdiv/CM1/3/2', '#/cours/fractions', '#/exo/partsegales/CE1/3/2', '#/exo/colorier/CM2/3/1', '#/exo/colorier/CE2/3/7', '#/exo/lirefrac/CE2/2/2', '#/exo/fracdroite/CM2/3/4', '#/exo/fraclire/CM1/3/1', '#/exo/egales/CM2/3/1', '#/exo/egales/CE2/2/1', '#/exo/fraccomp/CM1/3/1', '#/exo/entierfrac/CM1/3/1', '#/exo/entierfrac/CM2/2/2', '#/exo/fracsomme/CM2/3/1', '#/exo/fracquant/CM2/3/1', '#/exo/fracpb/CE2/3/1', '#/exo/probfrac/CM2/3/2', '#/cours/proportionnalite', '#/exo/linmul/CM2/3/2', '#/exo/linadd/CM1/3/1', '#/exo/propoupas/CM1/1/4', '#/exo/probprop/CM2/3/3', '#/exo/probprop/CE2/2/1', '#/cours/decimaux', '#/exo/fracvirgule/CM1/1/4', '#/exo/dectableau/CM1/2/1', '#/exo/deccomp/CM1/2/3', '#/exo/decranger/CM2/3/1', '#/exo/decencadrer/CM1/2/1', '#/exo/decarrondi/CM1/1/2', '#/exo/decdroite/CM1/2/1', '#/exo/declire/CM2/2/1', '#/exo/decpose/CM1/2/2', '#/exo/decfois/CM2/2/1', '#/exo/decmul/CM2/2/1', '#/exo/probdec/CM1/2/1', '#/cours/mesures', '#/exo/uniteok/CE1/1/2', '#/exo/convertir/CM1/2/1', '#/exo/monnaie/CE2/2/1', '#/exo/horloge/CE1/1/3', '#/exo/duree/CM1/2/1', '#/exo/perimetre/CE2/1/3', '#/exo/aire/CM1/1/2', '#/exo/probmes/CM2/2/1', '#/cours/geometrie', '#/exo/figures/CE1/2/5', '#/exo/angle/CE2/2/1', '#/exo/symetrie/CM1/2/1', '#/exo/solides/CE2/1/2', '#/exo/repere/CE1/2/1']) {
+for (const h of ['', '#/reglages', '#/exo/echanger/CE2/2/1', '#/exo/tableau/CE2/3/1', '#/exo/ranger/CE2/3/1', '#/exo/droite/CE1/2/1', '#/exo/droite/CE2/3/1', '#/exo/dizaines/CE2/3/1', '#/exo/droite/CM2/1/3', '#/exo/grands/CM2/3/1', '#/exo/suites/CE2/3/1', '#/exo/ranger/CM2/3/2', '#/cours/numeration', '#/exo/lire/CE2/2/1', '#/exo/addpose/CM1/3/3', '#/exo/subpose/CM1/3/3', '#/exo/probadd/CM2/3/4', '#/exo/complements/CE2/2/2', '#/exo/mental/CM1/3/2', '#/cours/addition', '#/cours/multiplication', '#/exo/mulpose/CM2/3/1', '#/exo/mulpose/CE2/1/1', '#/exo/multiples/CM1/3/2', '#/exo/rectangle/CE2/3/1', '#/exo/tables/CE2/3/1', '#/exo/fois10/CM2/3/1', '#/exo/doubles/CE1/3/1', '#/exo/probmul/CM2/3/5', '#/cours/division', '#/exo/partage/CE2/2/3', '#/exo/divpose/CM2/3/2', '#/exo/reste/CM1/2/1', '#/exo/famille/CE2/1/1', '#/exo/divisible/CM2/3/1', '#/exo/probdiv/CM1/3/2', '#/cours/fractions', '#/exo/partsegales/CE1/3/2', '#/exo/colorier/CM2/3/1', '#/exo/colorier/CE2/3/7', '#/exo/lirefrac/CE2/2/2', '#/exo/fracdroite/CM2/3/4', '#/exo/fraclire/CM1/3/1', '#/exo/egales/CM2/3/1', '#/exo/egales/CE2/2/1', '#/exo/fraccomp/CM1/3/1', '#/exo/entierfrac/CM1/3/1', '#/exo/entierfrac/CM2/2/2', '#/exo/fracsomme/CM2/3/1', '#/exo/fracquant/CM2/3/1', '#/exo/fracpb/CE2/3/1', '#/exo/probfrac/CM2/3/2', '#/cours/proportionnalite', '#/exo/linmul/CM2/3/2', '#/exo/linadd/CM1/3/1', '#/exo/propoupas/CM1/1/4', '#/exo/probprop/CM2/3/3', '#/exo/probprop/CE2/2/1', '#/cours/decimaux', '#/exo/fracvirgule/CM1/1/4', '#/exo/dectableau/CM1/2/1', '#/exo/deccomp/CM1/2/3', '#/exo/decranger/CM2/3/1', '#/exo/decencadrer/CM1/2/1', '#/exo/decarrondi/CM1/1/2', '#/exo/decdroite/CM1/2/1', '#/exo/declire/CM2/2/1', '#/exo/decpose/CM1/2/2', '#/exo/decfois/CM2/2/1', '#/exo/decmul/CM2/2/1', '#/exo/decdiv/CM2/1/4', '#/exo/symetrie/CM2/3/1', '#/exo/probdec/CM1/2/1', '#/cours/mesures', '#/exo/uniteok/CE1/1/2', '#/exo/convertir/CM1/2/1', '#/exo/monnaie/CE2/2/1', '#/exo/horloge/CE1/1/3', '#/exo/duree/CM1/2/1', '#/exo/perimetre/CE2/1/3', '#/exo/aire/CM1/1/2', '#/exo/probmes/CM2/2/1', '#/cours/geometrie', '#/exo/figures/CE1/2/5', '#/exo/angle/CE2/2/1', '#/exo/symetrie/CM1/2/1', '#/exo/solides/CE2/1/2', '#/exo/repere/CE1/2/1']) {
   for (const w of [360, 390]) {
     await p.setViewport({ width: w, height: 740, isMobile: true, hasTouch: true });
     await open(h);
