@@ -11,6 +11,9 @@ import { suites, term } from '../src/exos/suites';
 import { addpose, subpose } from '../src/exos/pose';
 import { probadd } from '../src/exos/probadd';
 import { evalExpr } from '../src/ui/expr';
+import { mulpose, partials } from '../src/exos/mulpose';
+import { multiples } from '../src/exos/multiples';
+import { rectangle } from '../src/exos/rectangle';
 
 const BASE = process.argv[2] || 'http://localhost:4174/compendium-primaire/';
 const W = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -220,8 +223,37 @@ console.log('Chapitre 2 : opérations posées et problèmes');
   await typeNumber(evalExpr(sol.nums, sol.ops)); await p.click('#check'); await W(60);
   t((await fb()).includes('Bravo'), 'probadd : bon calcul et bon résultat', await fb());
 }
+console.log('Chapitre 3 : multiplication');
+{
+  const fb = () => p.$eval('.fb', (x) => x.textContent || '');
+  const d = mulpose.generate('CM1', 3, 4); const ps = partials(d); const sol = mulpose.solution(d);
+  await open('#/exo/mulpose/CM1/3/4');
+  await p.click('#check'); await W(60);
+  t((await fb()).includes('Remplis'), 'mulpose : vérification bloquée tant que des lignes sont vides');
+  const typeLine = async (i: number, n: number) => { await p.click(`.ln-f[data-i="${i}"]`); for (const ch of String(n)) await p.click(`.co-kp [data-key="${ch}"]`); };
+  const sh = ps.findIndex((x) => x.k > 0);
+  for (let i = 0; i < sol.length; i++) await typeLine(i, i === sh ? d.a * ps[sh].c : sol[i]);
+  await p.click('#check'); await W(60);
+  t((await fb()).includes('décale') && (await p.$$('.ln-f.bad')).length >= 1, 'mulpose : décalage oublié → message ciblé et ligne en rouge', await fb());
+  await p.click(`.ln-f[data-i="${sh}"]`); for (let k = 0; k < 8; k++) await p.click('.co-kp [data-key="del"]');
+  for (const ch of String(sol[sh])) await p.click(`.co-kp [data-key="${ch}"]`);
+  await p.click('#check'); await W(60);
+  t((await fb()).includes('Bravo'), 'mulpose : correction acceptée au 2e essai', await fb());
+  const m = multiples.generate('CE2', 2, 6);
+  await open('#/exo/multiples/CE2/2/6');
+  for (const i of multiples.solution(m)) await p.click(`.pk-c[data-i="${i}"]`);
+  await p.click('#check'); await W(60);
+  t((await fb()).includes('Bravo'), 'multiples : cartes choisies au toucher');
+  const r = rectangle.generate('CE1', 2, 3);
+  await open('#/exo/rectangle/CE1/2/3');
+  t(await p.$$eval('.gr rect', (x) => x.length) === r.r * r.c, 'rectangle : le quadrillage a r × c carreaux');
+  const tok = (l: string) => p.evaluate((l) => [...document.querySelectorAll<HTMLElement>('.ex-pool .tok')].findIndex((x) => x.textContent === l && !x.hidden), l);
+  for (const [sl, v] of [[0, String(r.r)], [1, '+'], [2, String(r.c)]] as [number, string][]) { await p.click(`.ex-pool .tok:nth-child(${(await tok(v)) + 1})`); await p.click(`.ex-slot[data-s="${sl}"]`); await W(40); }
+  await typeNumber(r.r + r.c); await p.click('#check'); await W(60);
+  t((await fb()).includes('Tu as ajouté'), 'rectangle : addition au lieu de multiplication → message ciblé', await fb());
+}
 // cibles ≥ 44 px
-for (const h of ['', '#/reglages', '#/exo/echanger/CE2/2/1', '#/exo/tableau/CE2/3/1', '#/exo/ranger/CE2/3/1', '#/exo/droite/CE1/2/1', '#/exo/droite/CE2/3/1', '#/exo/dizaines/CE2/3/1', '#/exo/droite/CM2/1/3', '#/exo/grands/CM2/3/1', '#/exo/suites/CE2/3/1', '#/exo/ranger/CM2/3/2', '#/cours/numeration', '#/exo/lire/CE2/2/1', '#/exo/addpose/CM1/3/3', '#/exo/subpose/CM1/3/3', '#/exo/probadd/CM2/3/4', '#/exo/complements/CE2/2/2', '#/exo/mental/CM1/3/2', '#/cours/addition']) {
+for (const h of ['', '#/reglages', '#/exo/echanger/CE2/2/1', '#/exo/tableau/CE2/3/1', '#/exo/ranger/CE2/3/1', '#/exo/droite/CE1/2/1', '#/exo/droite/CE2/3/1', '#/exo/dizaines/CE2/3/1', '#/exo/droite/CM2/1/3', '#/exo/grands/CM2/3/1', '#/exo/suites/CE2/3/1', '#/exo/ranger/CM2/3/2', '#/cours/numeration', '#/exo/lire/CE2/2/1', '#/exo/addpose/CM1/3/3', '#/exo/subpose/CM1/3/3', '#/exo/probadd/CM2/3/4', '#/exo/complements/CE2/2/2', '#/exo/mental/CM1/3/2', '#/cours/addition', '#/cours/multiplication', '#/exo/mulpose/CM2/3/1', '#/exo/mulpose/CE2/1/1', '#/exo/multiples/CM1/3/2', '#/exo/rectangle/CE2/3/1', '#/exo/tables/CE2/3/1', '#/exo/fois10/CM2/3/1', '#/exo/doubles/CE1/3/1', '#/exo/probmul/CM2/3/5']) {
   for (const w of [360, 390]) {
     await p.setViewport({ width: w, height: 740, isMobile: true, hasTouch: true });
     await open(h);

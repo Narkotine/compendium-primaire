@@ -137,3 +137,24 @@ button.co-c { border: 2px solid var(--border-strong); background: var(--surface)
 .ex-in { cursor: grab; touch-action: none; }
 .ex-pool { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin: 10px 0 4px; }
 .ex-tok { font-size: 22px; padding: 0 10px; } .ex-tok.ex-op { min-width: 52px; background: var(--accent-soft); }
+/* chapitre 3 */
+.gr { display: block; margin: 8px auto; max-width: 100%; height: auto; }
+.gr-c { fill: var(--accent-soft); stroke: var(--accent); stroke-width: 1.5; }
+.gr-b { fill: color-mix(in srgb, var(--ko) 15%, var(--surface)); }
+.gr-5 { stroke: var(--text); stroke-width: 2.5; }
+.gr-cut { stroke: var(--ko); stroke-width: 4; stroke-dasharray: 6 4; }
+.ln { display: grid; gap: 4px; justify-items: end; max-width: 320px; margin: 0 auto; }
+.ln-top { font-size: 28px; font-weight: 700; font-variant-numeric: tabular-nums; letter-spacing: .12em; text-align: right; width: 100%; }
+.ln-r { display: flex; align-items: center; gap: 8px; width: 100%; justify-content: flex-end; }
+.ln-l { font-size: 14px; color: var(--text-2); flex: 1; text-align: left; }
+.ln-f { min-width: 170px; height: 52px; border-radius: 10px; border: 2px solid var(--border-strong); background: var(--surface); font-size: 26px; font-weight: 700; text-align: right; padding: 0 10px; font-variant-numeric: tabular-nums; }
+.ln-f.act { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent); }
+.ln-f.bad, .pk-c.bad { background: color-mix(in srgb, var(--ko) 18%, var(--surface)); border-color: var(--ko); }
+.ln-bar { height: 3px; background: var(--text); width: 100%; border-radius: 2px; }
+.ln .co-kp { width: 100%; }
+.pk { display: flex; flex-wrap: wrap; gap: 10px; justify-content: center; margin: 10px 0; }
+.pk-c { min-width: 72px; padding: 0 10px; font-size: 24px; cursor: pointer; }
+.fact { font-size: 15px; color: var(--text-2); }
+table.mini { border-collapse: collapse; margin: 6px auto; font-variant-numeric: tabular-nums; }
+table.mini th, table.mini td { border: 1px solid var(--border-strong); min-width: 30px; padding: 2px 6px; text-align: center; font-size: 18px; }
+table.mini th { font-size: 12px; color: var(--text-2); }

@@ -10,6 +10,7 @@ const SRC = process.env.COURS_DIR || '/workspace/compendium-primaire';
 const chapters = [
   { slug: 'numeration', dir: '01-numeration', n: 1 },
   { slug: 'addition', dir: '02-addition', n: 2 },
+  { slug: 'multiplication', dir: '03-multiplication', n: 3 },
 ];
 const out = [];
 for (const c of chapters) {

@@ -26,4 +26,17 @@ export const CHAPTERS: Chapter[] = [
     ],
     exos: ['probadd', 'complements', 'mental', 'addpose', 'subpose'],
   },
+  {
+    slug: 'multiplication', n: 3, title: 'Multiplier', short: 'Multiplication',
+    notions: [
+      { t: 'Le sens : des paquets pareils, un rectangle', lv: ['CE1', 'CE2'] },
+      { t: 'Tourner le rectangle : 3 × 4 = 4 × 3', lv: ['CE1', 'CE2'] },
+      { t: 'Les tables, comprises et retenues', lv: ['CE1', 'CE2', 'CM1', 'CM2'] },
+      { t: 'Doubles et moitiés', lv: ['CE1', 'CE2', 'CM1', 'CM2'] },
+      { t: '× 10, × 100, × 1 000', lv: ['CE1', 'CE2', 'CM1', 'CM2'] },
+      { t: 'La multiplication posée', lv: ['CE2', 'CM1', 'CM2'] },
+      { t: 'Les multiples', lv: ['CE1', 'CE2', 'CM1', 'CM2'] },
+    ],
+    exos: ['probmul', 'rectangle', 'tables', 'doubles', 'fois10', 'mulpose', 'multiples'],
+  },
 ];
