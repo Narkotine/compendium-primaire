@@ -61,9 +61,9 @@ import { fracsomme, fracquant } from '../src/exos/frac/calculs';
 import { fracpb } from '../src/exos/frac/histoires';
 const FW: [number, number, string][] = [[3, 4, 'trois quarts'], [1, 2, 'un demi'], [3, 2, 'trois demis'], [2, 3, 'deux tiers'], [5, 9, 'cinq neuvièmes'], [1, 5, 'un cinquième'], [7, 12, 'sept douzièmes'], [1, 11, 'un onzième'], [3, 17, 'trois dix-septièmes'], [1, 19, 'un dix-neuvième'], [1, 20, 'un vingtième'], [9, 10, 'neuf dixièmes'], [4, 15, 'quatre quinzièmes'], [1, 60, 'un soixantième']];
 for (const [a, b, w] of FW) t(fracWords(a, b) === w, `mots ${a}/${b} → ${fracWords(a, b)}`);
-const MAXD: Record<string, number> = { CE1: 10, CE2: 12, CM1: 20, CM2: 60 };
+const MAXD: Record<string, number> = { CE1: 10, CE2: 12, CM1: 20, CM2: 60, '6e': 60 };
 const CE1D = [2, 3, 4, 5, 6, 8, 10];
-const okDen = (lv: string, d: number) => (lv === 'CE1' ? CE1D.includes(d) : d <= MAXD[lv]);
+const okDen = (lv: string, d: number) => (lv === 'CE1' ? CE1D.includes(d) : d <= (MAXD[lv] ?? 60));
 for (let s = 1; s <= N; s++) for (const p of [1, 2, 3] as Palier[]) {
   for (const lv of partsegales.levels) {
     const d = partsegales.generate(lv, p, s);

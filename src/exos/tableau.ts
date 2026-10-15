@@ -24,7 +24,7 @@ export const tableau: ExoType<TabData, number[]> = {
   id: 'tableau',
   title: 'Placer les chiffres dans le tableau',
   notion: 'La valeur d’un chiffre dépend de sa place',
-  levels: ['CE1', 'CE2'],
+  levels: ['CE1', 'CE2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const cols = nCols(lv);

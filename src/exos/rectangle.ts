@@ -8,7 +8,7 @@ import { gridSvg } from '../ui/grid';
 export interface RectData { lv: Level; p: Palier; r: number; c: number; extra: number }
 export interface RectAns { nums: number[]; ops: string[]; result: number | null }
 export const rectangle: ExoType<RectData, RectAns> = {
-  id: 'rectangle', title: 'Le rectangle : combien de carreaux ?', notion: 'Sens de la multiplication', levels: ['CE1', 'CE2'],
+  id: 'rectangle', title: 'Le rectangle : combien de carreaux ?', notion: 'Sens de la multiplication', levels: ['CE1', 'CE2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const R = p === 1 ? [2, 5] : [3, 9], C = p === 1 ? [2, 6] : p === 2 ? [4, 9] : [6, 10];

@@ -24,7 +24,7 @@ const say = (c: Ctx, x: number, y: number | string) => (c.b === 'œufs' ? `${c.s
 /* ---------- linéarité multiplicative ---------- */
 export interface LmData { lv: Level; p: Palier; ci: number; x: number; y: number; k: number; dir: 'plus' | 'moins' }
 export const linmul: ExoType<LmData, (number | null)[]> = {
-  id: 'linmul', title: 'Fois plus, fois moins', notion: 'Linéarité multiplicative', levels: ['CM1', 'CM2'],
+  id: 'linmul', title: 'Fois plus, fois moins', notion: 'Linéarité multiplicative', levels: ['CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const ci = r.int(0, CTX.length - 1), c = CTX[ci];
@@ -56,7 +56,7 @@ export const linmul: ExoType<LmData, (number | null)[]> = {
 /* ---------- linéarité additive ---------- */
 export interface LaData { lv: Level; p: Palier; ci: number; x1: number; y1: number; x2: number; y2: number; op: '+' | '−' }
 export const linadd: ExoType<LaData, (number | null)[]> = {
-  id: 'linadd', title: 'Ajouter deux achats', notion: 'Linéarité additive', levels: ['CM1', 'CM2'],
+  id: 'linadd', title: 'Ajouter deux achats', notion: 'Linéarité additive', levels: ['CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const ci = r.pick([0, 1, 3]), c = CTX[ci];
@@ -106,7 +106,7 @@ function sits(r: Rng): Sit[] {
 }
 export interface PpData { lv: Level; p: Palier; list: Sit[] }
 export const propoupas: ExoType<PpData, number[]> = {
-  id: 'propoupas', title: 'Proportionnel ou pas ?', notion: 'Reconnaître la proportionnalité', levels: ['CM1', 'CM2'],
+  id: 'propoupas', title: 'Proportionnel ou pas ?', notion: 'Reconnaître la proportionnalité', levels: ['CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const all = sits(r);

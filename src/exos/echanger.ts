@@ -18,7 +18,7 @@ export const echanger: ExoType<EchData, number> = {
   id: 'echanger',
   title: 'Échanger pour trouver le nombre',
   notion: 'Échanger et décomposer',
-  levels: ['CE1', 'CE2'],
+  levels: ['CE1', 'CE2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const cols = nCols(lv);

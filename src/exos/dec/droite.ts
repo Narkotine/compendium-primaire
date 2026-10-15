@@ -14,7 +14,7 @@ const val = (d: DdData, k: number): Dec => {
   return { n: sn + k * st, s };
 };
 const base: ExoType<DdData, number | string> = {
-  id: 'decdroite', title: 'Placer un décimal sur la droite', notion: 'Droite graduée décimale', levels: ['CM1', 'CM2'],
+  id: 'decdroite', title: 'Placer un décimal sur la droite', notion: 'Droite graduée décimale', levels: ['CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     // step: 0.1 (CM1 p1), 0.01, or 1 with zoom feel

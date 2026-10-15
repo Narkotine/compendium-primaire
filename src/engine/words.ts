@@ -27,8 +27,9 @@ function below1000(n: number, final: boolean): string {
 }
 export function words(n: number): string {
   if (n === 0) return 'zéro';
-  const mi = Math.floor(n / 1e6), mil = Math.floor(n / 1000) % 1000, un = n % 1000;
+  const md = Math.floor(n / 1e9), mi = Math.floor(n / 1e6) % 1000, mil = Math.floor(n / 1000) % 1000, un = n % 1000;
   const parts: string[] = [];
+  if (md) parts.push(below1000(md, true) + '-milliard' + (md > 1 ? 's' : ''));
   if (mi) parts.push(below1000(mi, true) + '-million' + (mi > 1 ? 's' : ''));
   if (mil) parts.push((mil === 1 ? '' : below1000(mil, false) + '-') + 'mille');
   if (un) parts.push(below1000(un, true));

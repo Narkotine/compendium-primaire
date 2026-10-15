@@ -4,11 +4,11 @@ import { type ExoType, type Level, type Palier, UNITS, MAXN, fmt } from '../engi
 import { keypad } from '../ui/keypad';
 
 export interface F10Data { lv: Level; p: Palier; n: number; m: number; kind: 'prod' | 'fact' }
-const MS: Record<Level, number[]> = { CE1: [10], CE2: [10, 100], CM1: [10, 100, 1000], CM2: [10, 100, 1000] };
+const MS: Record<Level, number[]> = { CE1: [10], CE2: [10, 100], CM1: [10, 100, 1000], CM2: [10, 100, 1000], '6e': [10, 100, 1000] };
 const ans = (d: F10Data) => (d.kind === 'prod' ? d.n * d.m : d.m);
 const ranks = (m: number) => String(m).length - 1;
 export const fois10: ExoType<F10Data, number> = {
-  id: 'fois10', title: 'Multiplier par 10, 100, 1 000', notion: '× 10, × 100, × 1 000', levels: ['CE1', 'CE2', 'CM1', 'CM2'],
+  id: 'fois10', title: 'Multiplier par 10, 100, 1 000', notion: '× 10, × 100, × 1 000', levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const m = r.pick(MS[lv]);

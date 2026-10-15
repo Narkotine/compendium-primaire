@@ -7,7 +7,7 @@ import { type ExoType, type Level, type Palier, UNITS, fmt } from '../engine/typ
 import { colop } from '../ui/colop';
 
 export interface PoseData { lv: Level; p: Palier; op: '+' | '−'; rows: number[] }
-const MAXP: Record<Level, number> = { CE1: 999, CE2: 9999, CM1: 99999, CM2: 99999 };
+const MAXP: Record<Level, number> = { CE1: 999, CE2: 9999, CM1: 99999, CM2: 99999, '6e': 9999999 };
 const digitsOf = (n: number) => String(n).split('').reverse().map(Number);
 const val = (d: PoseData) => (d.op === '+' ? d.rows.reduce((a, b) => a + b, 0) : d.rows[0] - d.rows[1]);
 const cols = (d: PoseData) => Math.max(...d.rows.map((x) => String(x).length)) + (d.op === '+' ? 1 : 0);
@@ -29,7 +29,7 @@ function mkPose(op: '+' | '−'): ExoType<PoseData, number[]> {
     id: op === '+' ? 'addpose' : 'subpose',
     title: op === '+' ? 'Addition posée' : 'Soustraction posée',
     notion: op === '+' ? 'Addition posée' : 'Soustraction posée',
-    levels: ['CE1', 'CE2', 'CM1', 'CM2'],
+    levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'],
     generate(lv, p, seed) {
       const r = rng(seed);
       const max = MAXP[lv];

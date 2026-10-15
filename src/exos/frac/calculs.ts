@@ -15,9 +15,9 @@ const res = (d: SomData): Frac => {
   const nx = d.x.n * (D / d.x.d), ny = d.y.n * (D / d.y.d);
   return { n: d.op === '+' ? nx + ny : nx - ny, d: D };
 };
-const KS: Record<Level, SKind[][]> = { CE1: [['add'], ['add', 'sub'], ['add', 'sub', 'compl']], CE2: [['add', 'sub', 'compl'], ['add', 'sub', 'mult'], ['mult', 'compl']], CM1: [['add', 'sub'], ['mult', 'compl'], ['mult', 'add']], CM2: [['add', 'sub', 'mult'], ['mult', 'fois'], ['mult', 'fois', 'sub']] };
+const KS: Record<Level, SKind[][]> = { CE1: [['add'], ['add', 'sub'], ['add', 'sub', 'compl']], CE2: [['add', 'sub', 'compl'], ['add', 'sub', 'mult'], ['mult', 'compl']], CM1: [['add', 'sub'], ['mult', 'compl'], ['mult', 'add']], CM2: [['add', 'sub', 'mult'], ['mult', 'fois'], ['mult', 'fois', 'sub']], '6e': [['add', 'sub', 'mult'], ['mult', 'fois'], ['mult', 'fois', 'sub']] };
 export const fracsomme: ExoType<SomData, Frac> = {
-  id: 'fracsomme', title: 'Ajouter et enlever des fractions', notion: 'Additionner et soustraire', levels: ['CE1', 'CE2', 'CM1', 'CM2'],
+  id: 'fracsomme', title: 'Ajouter et enlever des fractions', notion: 'Additionner et soustraire', levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const kind = r.pick(KS[lv][p - 1]);
@@ -68,7 +68,7 @@ export const fracsomme: ExoType<SomData, Frac> = {
 export interface QData { lv: Level; p: Palier; a: number; b: number; n: number; unit: string }
 const UNITS_Q = [['billes', ''], ['€', ''], ['mètres', ''], ['élèves', ''], ['minutes', '']];
 export const fracquant: ExoType<QData, number> = {
-  id: 'fracquant', title: 'Fraction d’une quantité', notion: 'Fraction d’une quantité', levels: ['CM1', 'CM2'],
+  id: 'fracquant', title: 'Fraction d’une quantité', notion: 'Fraction d’une quantité', levels: ['CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const b = r.pick(p === 1 ? [2, 3, 4, 10] : [2, 3, 4, 5, 6, 8, 10]);

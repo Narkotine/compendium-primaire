@@ -13,12 +13,13 @@ const SHAPE: Record<Level, [number, number][]> = {
   CE2: [[2, 1], [3, 1], [2, 2]],
   CM1: [[3, 1], [2, 2], [3, 2]],
   CM2: [[3, 2], [3, 2], [3, 3]],
+  '6e': [[4, 2], [4, 3], [5, 3]],
 };
 /** produits partiels non nuls : a × (chiffre de b) × 10^k */
 export const partials = (d: MulData) => String(d.b).split('').reverse().map((c, k) => ({ k, c: Number(c), v: d.a * Number(c) * 10 ** k })).filter((x) => x.c > 0);
 export const nLines = (d: MulData) => { const ps = partials(d); return ps.length > 1 ? ps.length + 1 : 1; };
 export const mulpose: ExoType<MulData, (number | null)[]> = {
-  id: 'mulpose', title: 'Multiplication posée', notion: 'Multiplication posée', levels: ['CE2', 'CM1', 'CM2'],
+  id: 'mulpose', title: 'Multiplication posée', notion: 'Multiplication posée', levels: ['CE2', 'CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const [la, lb] = SHAPE[lv][p - 1];

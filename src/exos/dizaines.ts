@@ -14,11 +14,11 @@ export const dizaines: ExoType<DizData, number> = {
   id: 'dizaines',
   title: 'Chiffre des dizaines ou nombre de dizaines ?',
   notion: 'La valeur d’un chiffre dépend de sa place',
-  levels: ['CE1', 'CE2', 'CM1', 'CM2'],
+  levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const hi = MAXN[lv], lo = Math.ceil((hi + 1) / 10);
-    const units = { CE1: [1], CE2: [1, 2], CM1: [1, 2, 3, 4], CM2: [2, 3, 4, 5, 6] }[lv];
+    const units = { CE1: [1], CE2: [1, 2], CM1: [1, 2, 3, 4], CM2: [2, 3, 4, 5, 6], '6e': [3, 4, 5, 6, 7, 8, 9] }[lv];
     for (;;) {
       const n = r.int(lo, hi);
       const unit = r.pick(units);

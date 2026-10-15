@@ -6,7 +6,7 @@ import { share } from '../ui/share';
 export interface ParData { lv: Level; p: Palier; n: number; k: number; who: string }
 export interface ParAns { counts: number[]; left: number }
 export const partage: ExoType<ParData, ParAns> = {
-  id: 'partage', title: 'Partager équitablement', notion: 'Partager et grouper', levels: ['CE1', 'CE2'],
+  id: 'partage', title: 'Partager équitablement', notion: 'Partager et grouper', levels: ['CE1', 'CE2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const k = r.int(2, p === 1 ? 3 : lv === 'CE1' ? 4 : 6);

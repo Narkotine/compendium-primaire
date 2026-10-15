@@ -6,7 +6,7 @@ import { keypad } from '../ui/keypad';
 export interface FamData { lv: Level; p: Palier; a: number; b: number; kind: 'donne' | 'table' | 'dividende' }
 const ans = (d: FamData) => (d.kind === 'dividende' ? d.a * d.b : d.b);
 export const famille: ExoType<FamData, number> = {
-  id: 'famille', title: 'Diviser avec les tables', notion: 'Division et multiplication', levels: ['CE2', 'CM1', 'CM2'],
+  id: 'famille', title: 'Diviser avec les tables', notion: 'Division et multiplication', levels: ['CE2', 'CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const kind = p === 1 ? 'donne' : p === 2 ? 'table' : r.pick(['table', 'dividende'] as const);

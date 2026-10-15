@@ -22,7 +22,7 @@ export const suites: ExoType<SuiData, number> = {
   id: 'suites',
   title: 'Compter de n en n',
   notion: 'Compter de n en n, suites',
-  levels: ['CE1', 'CE2'],
+  levels: ['CE1', 'CE2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const steps = lv === 'CE1' ? [1, 2, 5, 10, 100] : [1, 10, 100, 1000, 5, 50, 25];

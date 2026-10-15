@@ -8,7 +8,7 @@ import { dectable, type DecCol } from '../../ui/dectable';
 import { keypad } from '../../ui/keypad';
 import { pickCards } from '../../ui/pick';
 
-const LV = (lv: Level) => (lv === 'CM2' ? 'CM2' : 'CM1') as 'CM1' | 'CM2';
+const LV = (lv: Level) => (lv === 'CM2' || lv === '6e' ? 'CM2' : 'CM1') as 'CM1' | 'CM2';
 
 /* ---------- fracvirgule : passer d'une écriture à l'autre ---------- */
 export type FvKind = 'frac→virgule' | 'virgule→frac' | 'somme→virgule' | 'egalite';
@@ -37,7 +37,7 @@ function sommeHtml(d: Dec) {
   return parts.join(' + ') || '0';
 }
 export const fracvirgule: ExoType<FvData, string | number[]> = {
-  id: 'fracvirgule', title: 'Fraction décimale et virgule', notion: 'Du dixième à la virgule', levels: ['CM1', 'CM2'],
+  id: 'fracvirgule', title: 'Fraction décimale et virgule', notion: 'Du dixième à la virgule', levels: ['CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed); const L = LV(lv);
     const d = mkDec(r, L, p);
@@ -145,7 +145,7 @@ function colsFor(lv: 'CM1' | 'CM2', needC: boolean): DecCol[] {
   return c;
 }
 export const dectableau: ExoType<DtData, number[]> = {
-  id: 'dectableau', title: 'Tableau de numération décimal', notion: 'Du dixième à la virgule', levels: ['CM1', 'CM2'],
+  id: 'dectableau', title: 'Tableau de numération décimal', notion: 'Du dixième à la virgule', levels: ['CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed); const L = LV(lv);
     const d = mkDec(r, L, p);

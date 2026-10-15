@@ -4,7 +4,7 @@ import { type ExoType, type Level, type Palier, fmt } from '../../engine/types';
 import { type Dec, fmtDec, fromParts, maxS, add, sub, mulInt, parseDec, cmp } from '../../engine/dec';
 import { keypad } from '../../ui/keypad';
 
-const LV = (lv: Level) => (lv === 'CM2' ? 'CM2' : 'CM1') as 'CM1' | 'CM2';
+const LV = (lv: Level) => (lv === 'CM2' || lv === '6e' ? 'CM2' : 'CM1') as 'CM1' | 'CM2';
 function mk(r: ReturnType<typeof rng>, lv: 'CM1' | 'CM2', sMax?: number): Dec {
   const s = r.int(1, sMax ?? maxS(lv));
   return fromParts(r.int(0, 50), Array.from({ length: s }, (_, i) => r.int(i === s - 1 ? 1 : 0, 9)));
@@ -13,7 +13,7 @@ function mk(r: ReturnType<typeof rng>, lv: 'CM1' | 'CM2', sMax?: number): Dec {
 /* ---------- decpose ---------- */
 export interface DpData { lv: Level; p: Palier; op: '+' | '−'; a: Dec; b: Dec }
 export const decpose: ExoType<DpData, string> = {
-  id: 'decpose', title: 'Addition et soustraction de décimaux', notion: 'Addition et soustraction', levels: ['CM1', 'CM2'],
+  id: 'decpose', title: 'Addition et soustraction de décimaux', notion: 'Addition et soustraction', levels: ['CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed); const L = LV(lv);
     for (;;) {
@@ -62,7 +62,7 @@ export const decpose: ExoType<DpData, string> = {
 /* ---------- decfois ---------- */
 export interface DfData { lv: Level; p: Palier; d: Dec; m: number; op: '×' | '÷' }
 export const decfois: ExoType<DfData, string> = {
-  id: 'decfois', title: '× 10, × 100, ÷ 10', notion: '× 10, × 100, ÷ 10', levels: ['CM2'],
+  id: 'decfois', title: '× 10, × 100, ÷ 10', notion: '× 10, × 100, ÷ 10', levels: ['CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const m = p === 1 ? 10 : r.pick([10, 100, 1000]);
@@ -109,7 +109,7 @@ export const decfois: ExoType<DfData, string> = {
 /* ---------- decmul ---------- */
 export interface DmData { lv: Level; p: Palier; d: Dec; k: number }
 export const decmul: ExoType<DmData, string> = {
-  id: 'decmul', title: 'Décimal × entier', notion: 'Décimal × entier', levels: ['CM1', 'CM2'],
+  id: 'decmul', title: 'Décimal × entier', notion: 'Décimal × entier', levels: ['CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed); const L = LV(lv);
     const k = L === 'CM1' || p === 1 ? r.int(2, 9) : r.int(2, p === 2 ? 15 : 35);

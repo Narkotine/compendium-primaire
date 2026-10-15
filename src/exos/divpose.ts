@@ -26,7 +26,7 @@ export function steps(x: DivData): Step[] {
 }
 const quot = (x: DivData) => Math.floor(x.n / x.d);
 export const divpose: ExoType<DivData, (number | null)[]> = {
-  id: 'divpose', title: 'Division posée', notion: 'Division posée', levels: ['CM1', 'CM2'],
+  id: 'divpose', title: 'Division posée', notion: 'Division posée', levels: ['CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const len = (lv === 'CM1' ? 3 : 4) + (p >= 2 ? 1 : 0);

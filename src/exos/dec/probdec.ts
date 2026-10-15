@@ -84,7 +84,7 @@ function make(r: Rng, lv: Level, p: Palier): PdInst {
 }
 
 export const probdec: ExoType<PdData, { nums: Dec[]; ops: string[]; result: string | null }> = {
-  id: 'probdec', title: 'Problèmes avec des décimaux', notion: 'Problèmes', levels: ['CM1', 'CM2'],
+  id: 'probdec', title: 'Problèmes avec des décimaux', notion: 'Problèmes', levels: ['CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     for (let i = 0; i < 40; i++) {

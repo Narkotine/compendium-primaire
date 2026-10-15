@@ -16,7 +16,7 @@ function unequal(r: ReturnType<typeof rng>, b: number) {
   for (;;) { const w = Array.from({ length: b }, () => r.int(4, 14)); const s = w.reduce((x, y) => x + y, 0); const c = [0]; w.forEach((x) => c.push(c[c.length - 1] + x / s)); if (Math.max(...w) >= 2 * Math.min(...w)) return c; }
 }
 export const partsegales: ExoType<PegData, number[]> = {
-  id: 'partsegales', title: 'Est-ce bien la bonne fraction ?', notion: 'Parts égales', levels: ['CE1', 'CE2', 'CM1', 'CM2'],
+  id: 'partsegales', title: 'Est-ce bien la bonne fraction ?', notion: 'Parts égales', levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const b = r.pick(p === 1 ? [2, 3, 4] : easyDen(lv, p).filter((x) => x <= 8));
@@ -64,7 +64,7 @@ export const partsegales: ExoType<PegData, number[]> = {
 /* ---------- colorier ---------- */
 export interface ColData { lv: Level; p: Palier; a: number; b: number; units: number; disc: boolean }
 export const colorier: ExoType<ColData, number> = {
-  id: 'colorier', title: 'Colorier une fraction', notion: 'Représenter une fraction', levels: ['CE1', 'CE2', 'CM1', 'CM2'],
+  id: 'colorier', title: 'Colorier une fraction', notion: 'Représenter une fraction', levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const b = r.pick(easyDen(lv, p));
@@ -99,7 +99,7 @@ export const colorier: ExoType<ColData, number> = {
 /* ---------- lire / écrire ---------- */
 export interface LirData { lv: Level; p: Palier; a: number; b: number; shape: Shape; shade: number[]; mode: 'fig' | 'mots' }
 export const lirefrac: ExoType<LirData, Frac> = {
-  id: 'lirefrac', title: 'Écrire la fraction', notion: 'Lire et écrire une fraction', levels: ['CE1', 'CE2', 'CM1', 'CM2'],
+  id: 'lirefrac', title: 'Écrire la fraction', notion: 'Lire et écrire une fraction', levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const b = r.pick(easyDen(lv, p));

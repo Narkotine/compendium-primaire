@@ -15,10 +15,10 @@ const base: ExoType<DroData, number> = {
   id: 'droite',
   title: 'Placer sur la demi-droite graduée',
   notion: 'La demi-droite graduée',
-  levels: ['CE1', 'CE2', 'CM1', 'CM2'],
+  levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
-    const steps = { CE1: [1, 10, 100], CE2: [1, 10, 100, 1000], CM1: [10, 100, 1000, 10000, 100000], CM2: [1000, 10000, 100000, 1000000, 10000000] }[lv];
+    const steps = { CE1: [1, 10, 100], CE2: [1, 10, 100, 1000], CM1: [10, 100, 1000, 10000, 100000], CM2: [1000, 10000, 100000, 1000000, 10000000], '6e': [10000, 100000, 1000000, 10000000, 100000000] }[lv];
     const max = MAXN[lv] + 1;
     for (;;) {
       const step = p === 1 ? r.pick(steps.slice(0, 2)) : r.pick(steps);

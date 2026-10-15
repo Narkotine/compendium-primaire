@@ -13,6 +13,7 @@ const TABS: Record<Level, number[][]> = {
   CE2: [[2, 3, 4, 5, 10], [2, 3, 4, 5, 6, 7, 8, 9], [6, 7, 8, 9]],
   CM1: [[2, 3, 4, 5, 6, 7, 8, 9], [6, 7, 8, 9], [6, 7, 8, 9]],
   CM2: [[2, 3, 4, 5, 6, 7, 8, 9], [6, 7, 8, 9], [6, 7, 8, 9]],
+  '6e': [[2, 3, 4, 5, 6, 7, 8, 9], [6, 7, 8, 9], [6, 7, 8, 9]],
 };
 const ans = (d: TabData) => (d.kind === 'prod' ? d.a * d.b : d.b);
 export function rebuild(a: number, b: number) {
@@ -29,7 +30,7 @@ export function rebuild(a: number, b: number) {
   return `${x} × 2, c’est le double de ${x} : ${x} + ${x} = ${2 * x}.`;
 }
 export const tables: ExoType<TabData, number> = {
-  id: 'tables', title: 'Tables de multiplication', notion: 'Les tables', levels: ['CE1', 'CE2', 'CM1', 'CM2'],
+  id: 'tables', title: 'Tables de multiplication', notion: 'Les tables', levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const kinds: Kind[] = p === 1 ? ['prod'] : p === 2 ? ['prod', 'fact'] : ['prod', 'fact', 'gauche'];

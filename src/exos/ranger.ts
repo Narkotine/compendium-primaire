@@ -10,7 +10,7 @@ export const ranger: ExoType<RanData, number[]> = {
   id: 'ranger',
   title: 'Ranger des nombres',
   notion: 'Comparer et ranger',
-  levels: ['CE1', 'CE2', 'CM1', 'CM2'],
+  levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const D = NDIG[lv];

@@ -7,7 +7,7 @@ export interface DivisData { lv: Level; p: Palier; k: number; cards: number[] }
 const good = (d: DivisData) => d.cards.map((n, i) => (n % d.k === 0 ? i : -1)).filter((i) => i >= 0);
 const RULE: Record<number, string> = { 2: 'son chiffre des unités est 0, 2, 4, 6 ou 8', 5: 'son chiffre des unités est 0 ou 5', 10: 'son chiffre des unités est 0' };
 export const divisible: ExoType<DivisData, number[]> = {
-  id: 'divisible', title: 'Divisible par 2, 5 ou 10 ?', notion: 'Critères de divisibilité', levels: ['CM1', 'CM2'],
+  id: 'divisible', title: 'Divisible par 2, 5 ou 10 ?', notion: 'Critères de divisibilité', levels: ['CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const k = r.pick([2, 5, 10]);

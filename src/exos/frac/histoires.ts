@@ -10,7 +10,7 @@ type HKind = 'compl' | 'somme' | 'diff';
 export interface HisData { lv: Level; p: Palier; kind: HKind; b: number; a: number; c: number; P: string; Q: string; extra: string }
 const ans = (d: HisData): Frac => ({ n: d.kind === 'compl' ? d.b - d.a : d.kind === 'somme' ? d.a + d.c : d.a - d.c, d: d.b });
 export const fracpb: ExoType<HisData, Frac> = {
-  id: 'fracpb', title: 'Problèmes de fractions', notion: 'Problèmes', levels: ['CE1', 'CE2', 'CM1', 'CM2'],
+  id: 'fracpb', title: 'Problèmes de fractions', notion: 'Problèmes', levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const kind: HKind = r.pick(p === 1 ? ['somme', 'compl'] : ['somme', 'compl', 'diff']);

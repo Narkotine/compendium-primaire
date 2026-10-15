@@ -4,11 +4,11 @@ import { type ExoType, type Level, type Palier, fmt } from '../engine/types';
 import { pickCards } from '../ui/pick';
 
 export interface MulsData { lv: Level; p: Palier; k: number; cards: number[] }
-const KS: Record<Level, number[][]> = { CE1: [[2], [2, 5, 10], [2, 5, 10]], CE2: [[2, 5, 10], [3, 4, 5], [3, 4, 6, 25]], CM1: [[3, 4, 6], [6, 7, 8, 9], [7, 8, 9, 25]], CM2: [[3, 4, 6], [6, 7, 8, 9], [7, 8, 9, 25]] };
+const KS: Record<Level, number[][]> = { CE1: [[2], [2, 5, 10], [2, 5, 10]], CE2: [[2, 5, 10], [3, 4, 5], [3, 4, 6, 25]], CM1: [[3, 4, 6], [6, 7, 8, 9], [7, 8, 9, 25]], CM2: [[3, 4, 6], [6, 7, 8, 9], [7, 8, 9, 25]], '6e': [[6, 7, 8, 9], [7, 8, 9, 25], [8, 9, 25, 50]] };
 const isM = (d: MulsData, n: number) => n % d.k === 0;
 const good = (d: MulsData) => d.cards.map((n, i) => (isM(d, n) ? i : -1)).filter((i) => i >= 0);
 export const multiples: ExoType<MulsData, number[]> = {
-  id: 'multiples', title: 'Trouver les multiples', notion: 'Multiples', levels: ['CE1', 'CE2', 'CM1', 'CM2'],
+  id: 'multiples', title: 'Trouver les multiples', notion: 'Multiples', levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const k = r.pick(KS[lv][p - 1]);

@@ -28,7 +28,7 @@ function frac(r: ReturnType<typeof rng>, decs: number): number {
 }
 
 export const decdiv: ExoType<DdData, string> = {
-  id: 'decdiv', title: 'Division décimale', notion: 'Division décimale', levels: ['CM2'],
+  id: 'decdiv', title: 'Division décimale', notion: 'Division décimale', levels: ['CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const decs = p === 1 ? 1 : p === 2 ? r.pick([1, 2]) : r.pick([1, 2, 3]);

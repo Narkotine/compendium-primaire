@@ -100,7 +100,7 @@ export function makeProblemExo(id: string, title: string, notion: string, levels
   return exo;
 }
 /** Plages des nombres des problèmes, par niveau. */
-export const RANGE: Record<Level, [number, number]> = { CE1: [10, 600], CE2: [100, 6000], CM1: [1000, 60000], CM2: [1000, 600000] };
+export const RANGE: Record<Level, [number, number]> = { CE1: [10, 600], CE2: [100, 6000], CM1: [1000, 60000], CM2: [1000, 600000], '6e': [10000, 9000000] };
 
 /** Données inutiles : au CE1 seulement au palier 3 ; à partir du CE2 dès le palier 2. */
 export const uOK = (lv: Level, p: Palier) => (lv === 'CE1' ? p >= 3 : p >= 2);

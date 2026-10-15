@@ -14,6 +14,7 @@ const KINDS: Record<Level, Kind[][]> = {
   CE2: [['plusU', 'moinsU', 'plus9'], ['plus9', 'moins9', 'plusD', 'moinsD'], ['plusD', 'moinsD', 'plusC', 'plus9']],
   CM1: [['plus9', 'moins9', 'plusD'], ['plusD', 'moinsD', 'plusC'], ['plusC', 'plusD', 'moinsD', 'plus9']],
   CM2: [['plus9', 'plusD', 'moinsD'], ['plusD', 'moinsD', 'plusC'], ['plusC', 'plusD', 'moinsD', 'plus9']],
+  '6e': [['plusD', 'moinsD', 'plusC'], ['plusC', 'plusD', 'moinsD'], ['plusC', 'plusD', 'moinsD', 'plus9']],
 };
 const res = (d: MenData) => (d.op === '+' ? d.a + d.b : d.a - d.b);
 
@@ -21,10 +22,10 @@ export const mental: ExoType<MenData, number> = {
   id: 'mental',
   title: 'Calcul mental malin',
   notion: 'Calcul mental raisonné',
-  levels: ['CE1', 'CE2', 'CM1', 'CM2'],
+  levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
-    const big = { CE1: 999, CE2: 9999, CM1: 99999, CM2: 99999 }[lv];
+    const big = { CE1: 999, CE2: 9999, CM1: 99999, CM2: 99999, '6e': 999999 }[lv];
     for (;;) {
       const kind = r.pick(KINDS[lv][p - 1]);
       let a = 0, b = 0, op: '+' | '−' = '+';

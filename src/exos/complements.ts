@@ -11,6 +11,7 @@ const KINDS: Record<Level, ComData['kind'][][]> = {
   CE2: [['table', 'dizaine'], ['dizaine', 'cent'], ['cent', 'mille']],
   CM1: [['dizaine', 'cent'], ['cent', 'mille'], ['cent', 'mille']],
   CM2: [['cent', 'mille'], ['cent', 'mille'], ['mille']],
+  '6e': [['mille'], ['mille'], ['mille']],
 };
 export const comText = (d: ComData) => {
   const b = d.c - d.a;
@@ -21,7 +22,7 @@ export const complements: ExoType<ComData, number> = {
   id: 'complements',
   title: 'Égalités à trou',
   notion: 'Faits numériques et compléments',
-  levels: ['CE1', 'CE2', 'CM1', 'CM2'],
+  levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const kind = r.pick(KINDS[lv][p - 1]);

@@ -5,7 +5,7 @@ import { lineFields } from '../ui/lines';
 
 export interface ResData { lv: Level; p: Palier; n: number; d: number }
 export const reste: ExoType<ResData, (number | null)[]> = {
-  id: 'reste', title: 'Quotient et reste', notion: 'Le reste', levels: ['CE2', 'CM1', 'CM2'],
+  id: 'reste', title: 'Quotient et reste', notion: 'Le reste', levels: ['CE2', 'CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const d = r.int(p === 1 ? 2 : 3, 9);

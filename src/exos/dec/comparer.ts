@@ -7,7 +7,7 @@ import { type Dec, fmtDec, fromParts, maxS, cmp, parseDec, roundInt, intPart } f
 import { orderList } from '../../ui/order';
 import { keypad } from '../../ui/keypad';
 
-const LV = (lv: Level) => (lv === 'CM2' ? 'CM2' : 'CM1') as 'CM1' | 'CM2';
+const LV = (lv: Level) => (lv === 'CM2' || lv === '6e' ? 'CM2' : 'CM1') as 'CM1' | 'CM2';
 function mk(r: ReturnType<typeof rng>, lv: 'CM1' | 'CM2', s?: number): Dec {
   const S = s ?? r.int(1, maxS(lv));
   return fromParts(r.int(0, 20), Array.from({ length: S }, (_, i) => r.int(i === S - 1 ? 1 : 0, 9)));
@@ -16,7 +16,7 @@ function mk(r: ReturnType<typeof rng>, lv: 'CM1' | 'CM2', s?: number): Dec {
 /* ---------- deccomp ---------- */
 export interface DcData { lv: Level; p: Palier; a: Dec; b: Dec }
 export const deccomp: ExoType<DcData, '<' | '=' | '>'> = {
-  id: 'deccomp', title: 'Comparer des décimaux', notion: 'Comparer, ranger, encadrer', levels: ['CM1', 'CM2'],
+  id: 'deccomp', title: 'Comparer des décimaux', notion: 'Comparer, ranger, encadrer', levels: ['CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed); const L = LV(lv);
     for (;;) {
@@ -85,7 +85,7 @@ export const deccomp: ExoType<DcData, '<' | '=' | '>'> = {
 export interface DrData { lv: Level; p: Palier; nums: Dec[]; dir: 'asc' | 'desc' }
 const sorted = (d: DrData) => d.nums.map((_, i) => i).sort((a, b) => cmp(d.nums[a], d.nums[b]) * (d.dir === 'asc' ? 1 : -1));
 export const decranger: ExoType<DrData, number[]> = {
-  id: 'decranger', title: 'Ranger des décimaux', notion: 'Comparer, ranger, encadrer', levels: ['CM1', 'CM2'],
+  id: 'decranger', title: 'Ranger des décimaux', notion: 'Comparer, ranger, encadrer', levels: ['CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed); const L = LV(lv);
     const k = p === 1 ? 3 : 4;
@@ -136,7 +136,7 @@ export const decranger: ExoType<DrData, number[]> = {
 /* ---------- decencadrer ---------- */
 export interface DeData { lv: Level; p: Palier; d: Dec; prec: 0 | 1 | 2; /** 0 = unité */ }
 export const decencadrer: ExoType<DeData, { lo: string; hi: string }> = {
-  id: 'decencadrer', title: 'Encadrer un décimal', notion: 'Comparer, ranger, encadrer', levels: ['CM1', 'CM2'],
+  id: 'decencadrer', title: 'Encadrer un décimal', notion: 'Comparer, ranger, encadrer', levels: ['CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed); const L = LV(lv);
     const prec = (p === 1 ? 0 : p === 2 ? r.pick([0, 1] as const) : r.pick([0, 1, L === 'CM2' ? 2 : 1] as const)) as 0 | 1 | 2;
@@ -209,7 +209,7 @@ export const decencadrer: ExoType<DeData, { lo: string; hi: string }> = {
 /* ---------- decarrondi ---------- */
 export interface DaData { lv: Level; p: Palier; d: Dec }
 export const decarrondi: ExoType<DaData, number> = {
-  id: 'decarrondi', title: 'Partie entière et arrondi', notion: 'Comparer, ranger, encadrer', levels: ['CM1', 'CM2'],
+  id: 'decarrondi', title: 'Partie entière et arrondi', notion: 'Comparer, ranger, encadrer', levels: ['CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed); const L = LV(lv);
     const d = mk(r, L, r.int(1, maxS(L)));

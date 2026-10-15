@@ -10,7 +10,7 @@ import { DEN, type Frac, eqF, fv } from './common';
 
 /* ---------- demi-droite ---------- */
 export interface FdData { lv: Level; p: Palier; b: number; U: number; k: number; mode: 'placer' | 'lire' }
-const LINE_DEN: Record<Level, number[]> = { CE1: [2, 4], CE2: [2, 4, 10], CM1: [2, 3, 4, 5, 6, 8, 10], CM2: [2, 3, 4, 5, 6, 8, 10] };
+const LINE_DEN: Record<Level, number[]> = { CE1: [2, 4], CE2: [2, 4, 10], CM1: [2, 3, 4, 5, 6, 8, 10], CM2: [2, 3, 4, 5, 6, 8, 10], '6e': [2, 3, 4, 5, 6, 8, 10, 12] };
 function genFd(lv: Level, p: Palier, seed: number, mode: 'placer' | 'lire'): FdData {
   const r = rng(seed);
   for (;;) {
@@ -31,7 +31,7 @@ function fdCheckPos(d: FdData, x: number) {
   return { ok: false, msg: `Entre 0 et 1, il y a ${d.b} intervalles : chacun vaut ${F(1, d.b)}. Avance de ${d.k} intervalles depuis 0.` };
 }
 export const fracdroite: ExoType<FdData, number> = {
-  id: 'fracdroite', title: 'Placer une fraction sur la droite', notion: 'Fractions sur la demi-droite', levels: ['CE2', 'CM1', 'CM2'],
+  id: 'fracdroite', title: 'Placer une fraction sur la droite', notion: 'Fractions sur la demi-droite', levels: ['CE2', 'CM1', 'CM2', '6e'],
   generate: (lv, p, seed) => genFd(lv, p, seed, 'placer'),
   solution: (d) => d.k,
   check: (d, x) => fdCheckPos(d, x),
@@ -44,7 +44,7 @@ export const fracdroite: ExoType<FdData, number> = {
   },
 };
 export const fraclire: ExoType<FdData, Frac> = {
-  id: 'fraclire', title: 'Lire une fraction sur la droite', notion: 'Fractions sur la demi-droite', levels: ['CE2', 'CM1', 'CM2'],
+  id: 'fraclire', title: 'Lire une fraction sur la droite', notion: 'Fractions sur la demi-droite', levels: ['CE2', 'CM1', 'CM2', '6e'],
   generate: (lv, p, seed) => genFd(lv, p, seed, 'lire'),
   solution: (d) => ({ n: d.k, d: d.b }),
   check(d, f) {
@@ -70,7 +70,7 @@ export const fraclire: ExoType<FdData, Frac> = {
 /* ---------- fractions égales ---------- */
 export interface EgData { lv: Level; p: Palier; a: number; b: number; k: number; miss: 'n' | 'd' | 'pick'; cards?: Frac[] }
 export const egales: ExoType<EgData, number | number[]> = {
-  id: 'egales', title: 'Fractions égales', notion: 'Égalités de fractions', levels: ['CE2', 'CM1', 'CM2'],
+  id: 'egales', title: 'Fractions égales', notion: 'Égalités de fractions', levels: ['CE2', 'CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const maxD = lv === 'CE2' ? 12 : lv === 'CM1' ? 20 : 60;
@@ -129,10 +129,11 @@ const KINDS: Record<Level, CmpKind[][]> = {
   CE2: [['memeD', 'unit'], ['memeN', 'unit', 'memeD'], ['multiple', 'memeN', 'egal']],
   CM1: [['memeD', 'memeN'], ['multiple', 'un', 'egal'], ['multiple', 'un', 'egal', 'memeN']],
   CM2: [['memeD', 'memeN', 'un'], ['multiple', 'un', 'egal'], ['multiple', 'un', 'egal']],
+  '6e': [['memeD', 'memeN', 'un'], ['multiple', 'un', 'egal'], ['multiple', 'un', 'egal']],
 };
 const sign = (d: CmpData) => (fv(d.x) < fv(d.y) ? '<' : fv(d.x) > fv(d.y) ? '>' : '=');
 export const fraccomp: ExoType<CmpData, string> = {
-  id: 'fraccomp', title: 'Comparer des fractions', notion: 'Comparer des fractions', levels: ['CE1', 'CE2', 'CM1', 'CM2'],
+  id: 'fraccomp', title: 'Comparer des fractions', notion: 'Comparer des fractions', levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const kind = r.pick(KINDS[lv][p - 1]);
@@ -181,7 +182,7 @@ export const fraccomp: ExoType<CmpData, string> = {
 /* ---------- entier + fraction ---------- */
 export interface EnData { lv: Level; p: Palier; n: number; b: number; kind: 'decomp' | 'unique' | 'encadrer' }
 export const entierfrac: ExoType<EnData, (number | null)[]> = {
-  id: 'entierfrac', title: 'Fractions plus grandes que 1', notion: 'Fractions supérieures à 1', levels: ['CM1', 'CM2'],
+  id: 'entierfrac', title: 'Fractions plus grandes que 1', notion: 'Fractions supérieures à 1', levels: ['CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
     const b = r.pick(lv === 'CM1' ? [2, 3, 4, 5, 6, 8, 10] : [3, 4, 5, 6, 8, 10, 12, 15, 20]);
