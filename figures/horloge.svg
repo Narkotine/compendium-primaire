@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 200" font-family="sans-serif">
+  <circle cx="100" cy="100" r="90" fill="#fff" stroke="#222" stroke-width="3"/>
+  <g font-size="16" font-weight="bold" text-anchor="middle">
+    <text x="100" y="28">12</text><text x="172" y="105">3</text><text x="100" y="185">6</text><text x="28" y="105">9</text>
+  </g>
+  <!-- hour hand ~2, minute ~30 → 2:30 -->
+  <line x1="100" y1="100" x2="100" y2="45" stroke="#d1495b" stroke-width="4" stroke-linecap="round"/>
+  <line x1="100" y1="100" x2="145" y2="100" stroke="#2a6fbe" stroke-width="3" stroke-linecap="round"/>
+  <circle cx="100" cy="100" r="5" fill="#222"/>
+  <text x="100" y="198" font-size="13" text-anchor="middle" fill="#333">2 h 30 min</text>
+</svg>

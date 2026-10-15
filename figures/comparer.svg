@@ -1,0 +1,35 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 160" font-family="sans-serif">
+  <text x="280" y="24" font-size="18" font-weight="bold" text-anchor="middle" fill="#111">Compare les dixièmes d'abord</text>
+  <!-- 2,5 as 2 + 5/10 -->
+  <g transform="translate(30,40)">
+    <text x="100" y="18" font-size="22" font-weight="bold" text-anchor="middle">2,50</text>
+    <rect x="0" y="30" width="40" height="28" fill="#a87408" stroke="#222" stroke-width="1.5"/>
+    <rect x="40" y="30" width="40" height="28" fill="#a87408" stroke="#222" stroke-width="1.5"/>
+    <text x="40" y="50" font-size="14" font-weight="bold" text-anchor="middle" fill="#fff">2 u</text>
+    <rect x="90" y="30" width="20" height="70" fill="#2a6fbe" stroke="#222" stroke-width="1.5"/>
+    <rect x="110" y="30" width="20" height="70" fill="#2a6fbe" stroke="#222" stroke-width="1.5"/>
+    <rect x="130" y="30" width="20" height="70" fill="#2a6fbe" stroke="#222" stroke-width="1.5"/>
+    <rect x="150" y="30" width="20" height="70" fill="#2a6fbe" stroke="#222" stroke-width="1.5"/>
+    <rect x="170" y="30" width="20" height="70" fill="#2a6fbe" stroke="#222" stroke-width="1.5"/>
+    <text x="130" y="118" font-size="12" text-anchor="middle" fill="#333">5 dixièmes</text>
+  </g>
+  <text x="280" y="95" font-size="28" font-weight="bold" text-anchor="middle" fill="#1f7a3d">&gt;</text>
+  <!-- 2,37 -->
+  <g transform="translate(320,40)">
+    <text x="100" y="18" font-size="22" font-weight="bold" text-anchor="middle">2,37</text>
+    <rect x="0" y="30" width="40" height="28" fill="#a87408" stroke="#222" stroke-width="1.5"/>
+    <rect x="40" y="30" width="40" height="28" fill="#a87408" stroke="#222" stroke-width="1.5"/>
+    <text x="40" y="50" font-size="14" font-weight="bold" text-anchor="middle" fill="#fff">2 u</text>
+    <rect x="90" y="30" width="20" height="70" fill="#2a6fbe" stroke="#222" stroke-width="1.5"/>
+    <rect x="110" y="30" width="20" height="70" fill="#2a6fbe" stroke="#222" stroke-width="1.5"/>
+    <rect x="130" y="30" width="20" height="70" fill="#2a6fbe" stroke="#222" stroke-width="1.5"/>
+    <rect x="160" y="30" width="14" height="50" fill="#d1495b" stroke="#222" stroke-width="1.5"/>
+    <rect x="174" y="30" width="14" height="50" fill="#d1495b" stroke="#222" stroke-width="1.5"/>
+    <rect x="188" y="30" width="14" height="50" fill="#d1495b" stroke="#222" stroke-width="1.5"/>
+    <rect x="202" y="30" width="14" height="50" fill="#d1495b" stroke="#222" stroke-width="1.5"/>
+    <rect x="216" y="30" width="14" height="50" fill="#d1495b" stroke="#222" stroke-width="1.5"/>
+    <rect x="230" y="30" width="14" height="50" fill="#d1495b" stroke="#222" stroke-width="1.5"/>
+    <rect x="244" y="30" width="14" height="50" fill="#d1495b" stroke="#222" stroke-width="1.5"/>
+    <text x="130" y="118" font-size="12" text-anchor="middle" fill="#333">3 dixièmes + 7 centièmes</text>
+  </g>
+</svg>

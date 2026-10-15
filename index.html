@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="fr" data-theme="auto">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>Maths Primaire</title>
+  <meta name="theme-color" content="#f7f6f2" />
+  <meta name="color-scheme" content="light dark" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-title" content="Maths Primaire" />
+  <link rel="icon" href="icons/favicon.svg" type="image/svg+xml" />
+  <link rel="apple-touch-icon" href="icons/apple-touch-icon.png" />
+  <script>
+    (function () {
+      try {
+        var s = JSON.parse(localStorage.getItem('compendium-primaire.settings') || '{}');
+        document.documentElement.dataset.theme = s.theme || 'auto';
+      } catch (e) {}
+    })();
+  </script>
+  <script type="module" crossorigin src="/compendium-primaire/assets/index-B-GDw9uV.js"></script>
+  <link rel="stylesheet" crossorigin href="/compendium-primaire/assets/index-Cf1KXxvd.css">
+<link rel="manifest" href="/compendium-primaire/manifest.webmanifest"></head>
+<body>
+  <div id="app"></div>
+  <div id="toasts" class="toasts" role="status" aria-live="polite"></div>
+  <div id="sr" class="sr-only" aria-live="polite"></div>
+  <noscript>Cette application a besoin de JavaScript.</noscript>
+</body>
+</html>

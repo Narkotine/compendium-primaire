@@ -1,0 +1,21 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 160" font-family="sans-serif">
+  <text x="160" y="22" font-size="14" font-weight="bold" text-anchor="middle">Rectangle 5 × 3 = 15 carreaux</text>
+  <g stroke="#222" stroke-width="1.5">
+    <rect x="40" y="40" width="40" height="40" fill="#2a6fbe"/>
+    <rect x="80" y="40" width="40" height="40" fill="#2a6fbe"/>
+    <rect x="120" y="40" width="40" height="40" fill="#2a6fbe"/>
+    <rect x="160" y="40" width="40" height="40" fill="#2a6fbe"/>
+    <rect x="200" y="40" width="40" height="40" fill="#2a6fbe"/>
+    <rect x="40" y="80" width="40" height="40" fill="#6fa8dc"/>
+    <rect x="80" y="80" width="40" height="40" fill="#6fa8dc"/>
+    <rect x="120" y="80" width="40" height="40" fill="#6fa8dc"/>
+    <rect x="160" y="80" width="40" height="40" fill="#6fa8dc"/>
+    <rect x="200" y="80" width="40" height="40" fill="#6fa8dc"/>
+    <rect x="40" y="120" width="40" height="30" fill="#b8d4f0"/>
+    <rect x="80" y="120" width="40" height="30" fill="#b8d4f0"/>
+    <rect x="120" y="120" width="40" height="30" fill="#b8d4f0"/>
+    <rect x="160" y="120" width="40" height="30" fill="#b8d4f0"/>
+    <rect x="200" y="120" width="40" height="30" fill="#b8d4f0"/>
+  </g>
+  <text x="280" y="90" font-size="18" font-weight="bold" fill="#111">15</text>
+</svg>

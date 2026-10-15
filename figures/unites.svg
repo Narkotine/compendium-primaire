@@ -1,0 +1,11 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 560 100" font-family="sans-serif">
+  <text x="280" y="20" font-size="14" font-weight="bold" text-anchor="middle">Longueurs : chaque case × 10 vers la droite</text>
+  <g font-size="13" font-weight="bold" text-anchor="middle">
+    <rect x="20" y="35" width="70" height="40" fill="#2c7a49" stroke="#222"/><text x="55" y="52" fill="#fff">km</text><text x="55" y="68" fill="#fff" font-size="10">×1000</text>
+    <rect x="100" y="35" width="70" height="40" fill="#a87408" stroke="#222"/><text x="135" y="60" fill="#fff">m</text>
+    <rect x="180" y="35" width="70" height="40" fill="#2a6fbe" stroke="#222"/><text x="215" y="52" fill="#fff">dm</text><text x="215" y="68" fill="#fff" font-size="10">×10</text>
+    <rect x="260" y="35" width="70" height="40" fill="#d1495b" stroke="#222"/><text x="295" y="52" fill="#fff">cm</text><text x="295" y="68" fill="#fff" font-size="10">×10</text>
+    <rect x="340" y="35" width="70" height="40" fill="#6b3fa0" stroke="#222"/><text x="375" y="60" fill="#fff">mm</text>
+  </g>
+  <text x="480" y="60" font-size="13" fill="#333">1 m = 100 cm</text>
+</svg>

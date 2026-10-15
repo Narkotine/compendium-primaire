@@ -1,0 +1,7 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 320 140" font-family="monospace">
+  <text x="20" y="30" font-size="18" font-weight="bold" fill="#111">45 ÷ 6</text>
+  <text x="20" y="60" font-size="16" fill="#333">6 × 7 = 42</text>
+  <text x="20" y="85" font-size="16" fill="#333">reste 3 → 30 dixièmes</text>
+  <text x="20" y="110" font-size="16" fill="#333">30 ÷ 6 = 5 → quotient <tspan font-weight="bold" fill="#1f7a3d">7,5</tspan></text>
+  <text x="240" y="70" font-size="28" font-weight="bold" fill="#2a6fbe">7,5</text>
+</svg>
