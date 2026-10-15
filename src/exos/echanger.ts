@@ -5,12 +5,12 @@
  * CE2 : ≤ 10 000, « 17 unités, 8 dizaines, 32 centaines et 2 milliers ».
  */
 import { rng } from '../engine/rng';
-import { type ExoType, type Level, type Palier, UNITS, unitName, nCols, fmt } from '../engine/types';
+import { type ExoType, type Level, type Palier, UNITS, MAXN, unitName, nCols, fmt } from '../engine/types';
 import { material } from '../ui/material';
 import { keypad } from '../ui/keypad';
 
 export interface EchData { lv: Level; p: Palier; counts: number[]; n: number }
-const LIMIT = { CE1: 999, CE2: 9999 };
+const LIMIT = MAXN;
 export const value = (c: number[]) => c.reduce((s, x, k) => s + x * UNITS[k].v, 0);
 const desc = (c: number[]) => c.map((x, k) => (x ? `${x} ${unitName(k, x)}` : '')).filter(Boolean).reverse().join(', ');
 

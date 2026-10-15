@@ -98,7 +98,12 @@ main { max-width: 760px; margin: 0 auto; padding: 12px 12px calc(32px + var(--sa
 .ob:disabled { opacity: .35; }
 /* demi-droite */
 .nl-svg { width: 100%; height: auto; background: var(--fig-bg); border-radius: 12px; cursor: pointer; }
-.nl-axis, .nl-tick { stroke: #222; stroke-width: 2.5; } .nl-lab { font: 700 15px var(--font); text-anchor: middle; fill: #111; }
+.nl-axis, .nl-tick { stroke: #222; stroke-width: 2.5; } .nl-lab { font-weight: 700; font-family: var(--font); fill: #111; }
 .nl-cur path { fill: var(--d); } .nl-mark { fill: #d1495b; } .nl-q { font: 700 20px var(--font); text-anchor: middle; fill: #d1495b; }
 .nl-good { fill: #1f7a3d; }
 .nl-btns { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; } .nl-help { font-size: 14px; color: var(--text-2); text-align: center; }
+.words { font-size: 22px; font-weight: 700; background: var(--surface-2); border-radius: 12px; padding: 10px 12px; margin: 6px 0 4px; overflow-wrap: anywhere; }
+.band { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; margin: 8px 0; }
+.band-c { min-width: 56px; padding: 10px 6px; text-align: center; border: 2px solid var(--border-strong); border-radius: 10px; font-weight: 700; font-size: 18px; background: var(--surface-2); }
+.band-hole { border-style: dashed; border-color: var(--accent); color: var(--accent); background: var(--accent-soft); }
+.exo-lv { flex-wrap: wrap; }

@@ -1,7 +1,10 @@
 /** Propriétés des générateurs sur N graines × niveaux × paliers (défaut 2000). Usage : tsx tests/props.test.ts 2000 */
 import { echanger, value } from '../src/exos/echanger';
 import { tableau, digitsOf, statement } from '../src/exos/tableau';
-import { UNITS, type Level, type Palier } from '../src/engine/types';
+import { UNITS, MAXN, type Level, type Palier } from '../src/engine/types';
+import { grands } from '../src/exos/grands';
+import { suites, term, noCarry } from '../src/exos/suites';
+import { words } from '../src/engine/words';
 import { dizaines } from '../src/exos/dizaines';
 import { ranger } from '../src/exos/ranger';
 import { droite, N_INT } from '../src/exos/droite';
@@ -49,10 +52,11 @@ for (const lv of LV) for (const p of P) for (let s = 1; s <= N; s++) {
   t(d.digits.every((x) => x === 0 || st.includes(String(x))), `tab énoncé complet ${tag}`);
   t(d.digits.length === (lv === 'CE1' ? 3 : 4), `tab colonnes ${tag}`);
 }
-// ---- chapitre 1, suite
-for (const lv of LV) for (const p of P) for (let s = 1; s <= N; s++) {
+// ---- chapitre 1, suite (tous niveaux)
+const LV4: Level[] = ['CE1', 'CE2', 'CM1', 'CM2'];
+for (const lv of LV4) for (const p of P) for (let s = 1; s <= N; s++) {
   const tag = `${lv}/p${p}/s${s}`;
-  const lim = lv === 'CE1' ? [100, 999] : [1000, 9999];
+  const lim = [Math.ceil((MAXN[lv] + 1) / 10), MAXN[lv]];
   const z = dizaines.generate(lv, p, s);
   t(z.n >= lim[0] && z.n <= lim[1], `diz plage ${tag}`);
   const good = dizaines.solution(z);
@@ -68,7 +72,7 @@ for (const lv of LV) for (const p of P) for (let s = 1; s <= N; s++) {
   const r = ranger.generate(lv, p, s);
   t(new Set(r.nums).size === r.nums.length, `ran distincts ${tag}`);
   t(r.nums.length === (p === 1 ? 4 : 5), `ran taille ${tag}`);
-  t(r.nums.every((x) => x <= lim[1] && x >= (p === 3 ? lim[0] / 10 - 10 : lim[0])), `ran plage ${tag} ${r.nums}`);
+  t(r.nums.every((x) => x <= lim[1] && x >= (p === 3 ? (lim[0] / 10) * 9 : lim[0])), `ran plage ${tag} ${r.nums}`);
   const sol = ranger.solution(r);
   t(ranger.check(r, sol).ok, `ran solution ${tag}`);
   t(!sol.every((x, i) => x === i), `ran pas déjà rangé ${tag}`);
@@ -79,13 +83,40 @@ for (const lv of LV) for (const p of P) for (let s = 1; s <= N; s++) {
 
   const g = droite.generate(lv, p, s);
   const end = g.start + N_INT * g.step;
-  t(g.start % g.step === 0 && g.start >= 0 && end <= (lv === 'CE1' ? 1000 : 10000), `dro plage ${tag}`);
+  t(g.start % g.step === 0 && g.start >= 0 && end <= MAXN[lv] + 1, `dro plage ${tag}`);
   t(g.k >= 1 && g.k <= N_INT && !g.labeled.includes(g.k), `dro cible non écrite ${tag}`);
   t(g.labeled.every((k) => k >= 0 && k <= N_INT) && g.labeled[1] > g.labeled[0], `dro étiquettes ${tag}`);
   if (lv === 'CE1') t([1, 10, 100].includes(g.step), `dro pas CE1 ${tag}`);
   t(droite.check(g, droite.solution(g)).ok, `dro solution ${tag}`);
   if (g.mode === 'placer') { const w = g.k === N_INT ? g.k - 1 : g.k + 1; t(/espaces/.test(droite.check(g, w).msg ?? ''), `dro diag décalage ${tag}`); }
   t(droite.hint(g).length > 10 && droite.correction(g).length > 10, `dro aide ${tag}`);
+}
+// ---- grands nombres et suites
+const W1: Record<number, string> = { 635: 'six-cent-trente-cinq', 80: 'quatre-vingts', 81: 'quatre-vingt-un', 71: 'soixante-et-onze', 200: 'deux-cents', 200000: 'deux-cent-mille', 280000: 'deux-cent-quatre-vingt-mille', 2030004: 'deux-millions-trente-mille-quatre', 1000000: 'un-million', 300000000: 'trois-cents-millions', 1001: 'mille-un', 21: 'vingt-et-un', 91: 'quatre-vingt-onze' };
+for (const [n, w] of Object.entries(W1)) t(words(Number(n)) === w, `lettres ${n} → ${words(Number(n))}`);
+for (const lv of ['CM1', 'CM2'] as Level[]) for (const p of P) for (let s = 1; s <= N; s++) {
+  const tag = `${lv}/p${p}/s${s}`;
+  const g = grands.generate(lv, p, s);
+  const len = String(g.n).length;
+  t(g.n <= MAXN[lv] && len >= (lv === 'CM1' ? 4 : 7), `gra plage ${tag} ${g.n}`);
+  if (lv === 'CM1' && p >= 2) t(len >= 5, `gra CM1 ≥ 5 chiffres ${tag}`);
+  t(grands.check(g, g.n).ok, `gra solution ${tag}`);
+  if (p === 1) t(!String(g.n).includes('0'), `gra p1 sans zéro ${tag}`);
+  if (p >= 2) t(String(g.n).includes('0'), `gra p2-3 avec zéros ${tag}`);
+  const nz = Number(String(g.n).replace(/0/g, ''));
+  if (p >= 2) t(/zéros/.test(grands.check(g, nz).msg ?? ''), `gra diag zéros oubliés ${tag}`);
+  t(!/--|^-|-$/.test(words(g.n)) && /^[a-zé-]+$/.test(words(g.n)), `gra lettres bien formées ${tag}`);
+}
+for (const lv of ['CE1', 'CE2'] as Level[]) for (const p of P) for (let s = 1; s <= N; s++) {
+  const tag = `${lv}/p${p}/s${s}`;
+  const d = suites.generate(lv, p, s);
+  const all = Array.from({ length: d.len }, (_, i) => term(d, i));
+  t(all.every((x) => x >= 0 && x <= MAXN[lv]), `sui plage ${tag}`);
+  t(d.hole >= 2 && d.hole < d.len, `sui case vide après 2 termes ${tag}`);
+  t(suites.check(d, term(d, d.hole)).ok, `sui solution ${tag}`);
+  if (p === 1) t(d.step > 0, `sui p1 croissante ${tag}`);
+  const nc = noCarry(term(d, d.hole - 1), d.step);
+  if (nc !== null && nc !== term(d, d.hole)) t(/échange/.test(suites.check(d, nc).msg ?? ''), `sui diag sans échange ${tag}`);
 }
 // ---- maîtrise, révisions espacées (localStorage simulé)
 {
@@ -124,6 +155,6 @@ for (const lv of LV) for (const p of P) for (let s = 1; s <= N; s++) {
   }
   t(seen > 0, 'diag ordre testé');
 }
-console.log(`${pass} vérifications réussies, ${fail} échecs (${N} graines × 2 niveaux × 3 paliers)`);
+console.log(`${pass} vérifications réussies, ${fail} échecs (${N} graines par niveau et par palier)`);
 errs.forEach((e) => console.log('  ✗', e));
 process.exit(fail ? 1 : 0);

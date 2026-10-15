@@ -3,7 +3,7 @@
  * Les deux questions alternent pour casser la confusion (piège classique du programme : « 63 dizaines et 5 unités »).
  */
 import { rng } from '../engine/rng';
-import { type ExoType, type Level, type Palier, UNITS, fmt } from '../engine/types';
+import { type ExoType, type Level, type Palier, UNITS, MAXN, fmt } from '../engine/types';
 import { keypad } from '../ui/keypad';
 
 export interface DizData { lv: Level; p: Palier; n: number; unit: number; kind: 'chiffre' | 'nombre' }
@@ -14,11 +14,11 @@ export const dizaines: ExoType<DizData, number> = {
   id: 'dizaines',
   title: 'Chiffre des dizaines ou nombre de dizaines ?',
   notion: 'La valeur d’un chiffre dépend de sa place',
-  levels: ['CE1', 'CE2'],
+  levels: ['CE1', 'CE2', 'CM1', 'CM2'],
   generate(lv, p, seed) {
     const r = rng(seed);
-    const [lo, hi] = lv === 'CE1' ? [100, 999] : [1000, 9999];
-    const units = lv === 'CE1' ? [1, 2] : [1, 2, 3];
+    const hi = MAXN[lv], lo = Math.ceil((hi + 1) / 10);
+    const units = { CE1: [1], CE2: [1, 2], CM1: [1, 2, 3, 4], CM2: [2, 3, 4, 5, 6] }[lv];
     for (;;) {
       const n = r.int(lo, hi);
       const unit = r.pick(units);
@@ -36,13 +36,13 @@ export const dizaines: ExoType<DizData, number> = {
     if (d.kind === 'chiffre' && a === count(d.n, d.unit)) return { ok: false, msg: `Tu as donné le NOMBRE de ${u.many} en tout. On demande seulement le CHIFFRE qui est dans la colonne des ${u.many}.` };
     if (d.kind === 'nombre' && a === digit(d.n, d.unit)) return { ok: false, msg: `Ça, c'est le chiffre de la colonne des ${u.many}. Mais les colonnes de gauche contiennent aussi des ${u.many} ! Compte-les toutes.` };
     if (d.kind === 'nombre' && a === d.n) return { ok: false, msg: `Ça, c'est le nombre d'unités. Combien de paquets de ${u.v} peut-on faire ?` };
-    const other = [0, 1, 2, 3].filter((k) => k !== d.unit && k < String(d.n).length);
+    const other = [0, 1, 2, 3, 4, 5, 6, 7, 8].filter((k) => k !== d.unit && k < String(d.n).length);
     for (const k of other) if (a === (d.kind === 'chiffre' ? digit(d.n, k) : count(d.n, k))) return { ok: false, msg: `Tu as regardé la colonne des ${UNITS[k].many}. On demande les ${u.many}.` };
     return { ok: false, msg: `Ce n'est pas ça. Range le nombre dans le tableau dans ta tête : ${u.short} est la colonne des ${u.many}.` };
   },
   hint(d) {
     const u = UNITS[d.unit];
-    if (d.kind === 'chiffre') return `Le chiffre des unités est tout à droite. Puis viennent les dizaines, les centaines, les milliers. Cherche la colonne des ${u.many}.`;
+    if (d.kind === 'chiffre') return `Le chiffre des unités est tout à droite. Puis, vers la gauche : dizaines, centaines, milliers… Cherche la colonne des ${u.many}.`;
     return `Cache les chiffres à droite de la colonne des ${u.many}. Le nombre qui reste, c'est le nombre de ${u.many}.`;
   },
   correction(d) {

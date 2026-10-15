@@ -10,9 +10,17 @@ export function numberLine(el: HTMLElement, o: { ticks: number; labels: Record<n
   let locked = false;
   const W = 340, X0 = 20, X1 = 320, dx = (X1 - X0) / N;
   const x = (k: number) => X0 + k * dx;
-  el.innerHTML = `<div class="nl"><svg class="nl-svg" viewBox="0 0 ${W} 110" role="slider" tabindex="0" aria-label="Demi-droite graduée : place le curseur" aria-valuemin="0" aria-valuemax="${N}" aria-valuenow="0">
+  // étiquettes longues (CM) : plus petites ; deux étiquettes voisines : la seconde plus bas
+  const lab = (k: number) => {
+    const t = o.labels[k];
+    const low = o.labels[k - 1] !== undefined;
+    const anchor = k === 0 && t.length > 4 ? 'start' : k === N && t.length > 4 ? 'end' : 'middle';
+    const xx = anchor === 'start' ? x(k) - 8 : anchor === 'end' ? x(k) + 8 : x(k);
+    return `<text x="${xx}" y="${low ? 108 : 86}" class="nl-lab" text-anchor="${anchor}" style="font-size:${t.length > 7 ? 12.5 : 15}px">${t}</text>`;
+  };
+  el.innerHTML = `<div class="nl"><svg class="nl-svg" viewBox="0 0 ${W} 124" role="slider" tabindex="0" aria-label="Demi-droite graduée : place le curseur" aria-valuemin="0" aria-valuemax="${N}" aria-valuenow="0">
     <line x1="${X0 - 12}" y1="50" x2="${X1 + 14}" y2="50" class="nl-axis"/><path d="M${X1 + 14} 44 L${X1 + 22} 50 L${X1 + 14} 56" class="nl-axis" fill="none"/>
-    ${Array.from({ length: N + 1 }, (_, k) => `<line x1="${x(k)}" y1="${o.labels[k] !== undefined ? 38 : 42}" x2="${x(k)}" y2="${o.labels[k] !== undefined ? 62 : 58}" class="nl-tick"/>${o.labels[k] !== undefined ? `<text x="${x(k)}" y="86" class="nl-lab">${o.labels[k]}</text>` : ''}`).join('')}
+    ${Array.from({ length: N + 1 }, (_, k) => `<line x1="${x(k)}" y1="${o.labels[k] !== undefined ? 38 : 42}" x2="${x(k)}" y2="${o.labels[k] !== undefined ? 62 : 58}" class="nl-tick"/>${o.labels[k] !== undefined ? lab(k) : ''}`).join('')}
     ${o.marked !== undefined ? `<circle cx="${x(o.marked)}" cy="50" r="7" class="nl-mark"/><text x="${x(o.marked)}" y="24" class="nl-q">?</text>` : ''}
     <g class="nl-cur" visibility="hidden"><path d="M0 46 L-11 22 L11 22 Z"/><circle r="22" cy="20" fill="transparent"/></g>
   </svg><div class="nl-btns"><button type="button" class="ob" data-d="-1" aria-label="Curseur à gauche">←</button><span class="nl-help">Touche la droite pour placer la flèche.</span><button type="button" class="ob" data-d="1" aria-label="Curseur à droite">→</button></div></div>`;

@@ -6,6 +6,8 @@ import { tableau } from '../src/exos/tableau';
 import { ranger } from '../src/exos/ranger';
 import { droite } from '../src/exos/droite';
 import { dizaines } from '../src/exos/dizaines';
+import { grands } from '../src/exos/grands';
+import { suites, term } from '../src/exos/suites';
 
 const BASE = process.argv[2] || 'http://localhost:4174/compendium-primaire/';
 const W = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -149,6 +151,21 @@ console.log('Demi-droite palier 3 (lire) et dizaines');
   await typeNumber(Math.floor(z.n / 10) % 10); await p.click('#check'); await W(60);
   t((await p.$eval('.fb', (x) => x.textContent || '')).includes('colonnes de gauche'), 'dizaines : message ciblé (chiffre au lieu du nombre)');
 }
+console.log('Grands nombres (CM2) et suites (CE1)');
+{
+  const g = grands.generate('CM2', 3, 2);
+  await open('#/exo/grands/CM2/3/2');
+  await typeNumber(Number(String(g.n).replace(/0/g, ''))); await p.click('#check'); await W(60);
+  t((await p.$eval('.fb', (x) => x.textContent || '')).includes('zéros'), 'grands : message ciblé sur les zéros');
+  for (let i = 0; i < 10; i++) await p.click('.kp-del');
+  await typeNumber(g.n); await p.click('#check'); await W(60);
+  t((await p.$eval('.fb', (x) => x.textContent || '')).includes('Bravo'), 'grands : 9 chiffres au pavé');
+  t((await p.$eval('.kp-v', (x) => x.textContent || '')).split('\u202f').length >= 3, 'pavé : chiffres groupés par classes');
+  const d = suites.generate('CE1', 3, 4);
+  await open('#/exo/suites/CE1/3/4');
+  await typeNumber(term(d, d.hole)); await p.click('#check'); await W(60);
+  t((await p.$eval('.fb', (x) => x.textContent || '')).includes('Bravo'), 'suites : bonne réponse');
+}
 console.log('Réglages : chronomètre désactivé par défaut');
 {
   await open('#/exo/dizaines/CE1/1/1');
@@ -159,7 +176,7 @@ console.log('Réglages : chronomètre désactivé par défaut');
   await open('#/reglages'); await p.click('#chrono'); await W(50);
 }
 // cibles ≥ 44 px
-for (const h of ['', '#/reglages', '#/exo/echanger/CE2/2/1', '#/exo/tableau/CE2/3/1', '#/exo/ranger/CE2/3/1', '#/exo/droite/CE1/2/1', '#/exo/droite/CE2/3/1', '#/exo/dizaines/CE2/3/1']) {
+for (const h of ['', '#/reglages', '#/exo/echanger/CE2/2/1', '#/exo/tableau/CE2/3/1', '#/exo/ranger/CE2/3/1', '#/exo/droite/CE1/2/1', '#/exo/droite/CE2/3/1', '#/exo/dizaines/CE2/3/1', '#/exo/droite/CM2/1/3', '#/exo/grands/CM2/3/1', '#/exo/suites/CE2/3/1', '#/exo/ranger/CM2/3/2', '#/cours/numeration']) {
   for (const w of [360, 390]) {
     await p.setViewport({ width: w, height: 740, isMobile: true, hasTouch: true });
     await open(h);

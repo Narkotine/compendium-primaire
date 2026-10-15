@@ -1,6 +1,6 @@
 /** « Ranger » : 4 ou 5 nombres à mettre dans l'ordre (programme : jusqu'à cinq nombres, ex. 234, 243, 239, 300, 229). */
 import { rng } from '../engine/rng';
-import { type ExoType, type Level, type Palier, fmt } from '../engine/types';
+import { type ExoType, type Level, type Palier, NDIG, fmt } from '../engine/types';
 import { orderList } from '../ui/order';
 
 export interface RanData { lv: Level; p: Palier; nums: number[]; dir: 'asc' | 'desc' }
@@ -10,24 +10,25 @@ export const ranger: ExoType<RanData, number[]> = {
   id: 'ranger',
   title: 'Ranger des nombres',
   notion: 'Comparer et ranger',
-  levels: ['CE1', 'CE2'],
+  levels: ['CE1', 'CE2', 'CM1', 'CM2'],
   generate(lv, p, seed) {
     const r = rng(seed);
-    const big = lv === 'CE2';
+    const D = NDIG[lv];
     const k = p === 1 ? 4 : 5;
+    const rnd = (len: number) => Array.from({ length: len }, () => r.int(0, 9)).join('');
     for (;;) {
       const set = new Set<number>();
-      if (p === 1) { // ordres de grandeur différents
-        const heads = r.shuffle(big ? [1, 2, 3, 4, 5, 6, 7, 8, 9] : [1, 2, 3, 4, 5, 6, 7, 8, 9]).slice(0, k);
-        for (const h of heads) set.add(big ? h * 1000 + r.int(0, 999) : h * 100 + r.int(0, 99));
-      } else { // même début, chiffres permutés : 234, 243, 239…
-        const base = big ? r.int(1, 9) * 1000 + r.int(0, 9) * 100 : r.int(1, 9) * 100;
-        const ds = [r.int(0, 9), r.int(0, 9), r.int(0, 9)];
-        set.add(base + ds[0] * 10 + ds[1]); set.add(base + ds[1] * 10 + ds[0]);
-        while (set.size < k - (p === 3 ? 1 : 0)) set.add(base + r.int(0, 99));
-        if (p === 3) { // un nombre avec moins de chiffres, mais de « gros » chiffres : 99 < 100, 999 < 1 009
-          set.add(big ? r.int(900, 999) : r.int(90, 99));
-        }
+      if (p === 1) { // premiers chiffres tous différents
+        for (const h of r.shuffle([1, 2, 3, 4, 5, 6, 7, 8, 9]).slice(0, k)) set.add(Number(h + rnd(D - 1)));
+      } else { // même début, chiffres de la fin permutés (234, 243, 239…) ; au CM, la différence est plus loin à droite
+        const tail = D >= 6 ? 3 : 2;
+        const pre = String(r.int(1, 9)) + rnd(D - tail - 1);
+        const t = rnd(tail).split('');
+        set.add(Number(pre + t.join(''))); set.add(Number(pre + [...t].reverse().join('')));
+        let g = 0;
+        while (set.size < k - (p === 3 ? 1 : 0) && g++ < 50) set.add(Number(pre + rnd(tail)));
+        // un nombre avec un chiffre de moins mais de « gros » chiffres : 99 < 100, 999 < 1 009
+        if (p === 3) set.add(Number('9' + rnd(D - 2)));
       }
       const nums = r.shuffle([...set]);
       if (nums.length !== k) continue;

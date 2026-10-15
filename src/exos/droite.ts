@@ -3,7 +3,7 @@
  * Pas de 1, 10, 100 (CE1), et 1 000 (CE2) ; portions qui ne commencent pas à 0.
  */
 import { rng } from '../engine/rng';
-import { type ExoType, type Level, type Palier, fmt } from '../engine/types';
+import { type ExoType, type Level, type Palier, MAXN, fmt } from '../engine/types';
 import { numberLine } from '../ui/numberline';
 import { keypad } from '../ui/keypad';
 
@@ -15,11 +15,11 @@ export const droite: ExoType<DroData, number> = {
   id: 'droite',
   title: 'Placer sur la demi-droite graduée',
   notion: 'La demi-droite graduée',
-  levels: ['CE1', 'CE2'],
+  levels: ['CE1', 'CE2', 'CM1', 'CM2'],
   generate(lv, p, seed) {
     const r = rng(seed);
-    const steps = lv === 'CE1' ? [1, 10, 100] : [1, 10, 100, 1000];
-    const max = lv === 'CE1' ? 1000 : 10000;
+    const steps = { CE1: [1, 10, 100], CE2: [1, 10, 100, 1000], CM1: [10, 100, 1000, 10000, 100000], CM2: [1000, 10000, 100000, 1000000, 10000000] }[lv];
+    const max = MAXN[lv] + 1;
     for (;;) {
       const step = p === 1 ? r.pick(steps.slice(0, 2)) : r.pick(steps);
       const start = step * r.int(0, Math.floor(max / step) - N_INT);
