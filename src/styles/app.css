@@ -220,3 +220,7 @@ table.mini th { font-size: 12px; color: var(--text-2); }
 .enc-fields { display: flex; align-items: center; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 12px 0; }
 .enc-h { min-width: 72px; min-height: 52px; padding: 0 14px; border: 2px solid var(--accent); border-radius: 12px; background: var(--surface); font-size: 22px; font-weight: 700; }
 .enc-h.act { box-shadow: 0 0 0 3px var(--accent); }
+
+.clk { width: 100%; max-width: 220px; height: auto; display: block; margin: 12px auto; }
+.aire-fig { display: block; margin: 12px auto; background: var(--fig-bg); border-radius: 8px; }
+.enc-h.bad { border-color: var(--ko); background: color-mix(in srgb, var(--ko) 18%, var(--surface)); }

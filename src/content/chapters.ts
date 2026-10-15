@@ -86,4 +86,15 @@ export const CHAPTERS: Chapter[] = [
     ],
     exos: ['probprop', 'propoupas', 'linmul', 'linadd'],
   },
+  {
+    slug: 'mesures', n: 8, title: 'Grandeurs et mesures', short: 'Mesures',
+    notions: [
+      { t: 'Unités et conversions', lv: ['CE1', 'CE2', 'CM1', 'CM2'] },
+      { t: 'La monnaie', lv: ['CE1', 'CE2'] },
+      { t: 'L’heure et les durées', lv: ['CE1', 'CE2', 'CM1'] },
+      { t: 'Le périmètre', lv: ['CE2', 'CM1'] },
+      { t: 'L’aire', lv: ['CM1', 'CM2'] },
+    ],
+    exos: ['uniteok', 'convertir', 'monnaie', 'horloge', 'duree', 'perimetre', 'aire', 'probmes'],
+  },
 ];
