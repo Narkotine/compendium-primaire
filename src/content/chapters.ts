@@ -65,6 +65,18 @@ export const CHAPTERS: Chapter[] = [
     exos: ['fracpb', 'probfrac', 'partsegales', 'colorier', 'lirefrac', 'fraccomp', 'fracsomme', 'egales', 'fracdroite', 'fraclire', 'entierfrac', 'fracquant'],
   },
   {
+    slug: 'decimaux', n: 6, title: 'Les nombres décimaux', short: 'Décimaux',
+    notions: [
+      { t: 'Du dixième à l’écriture à virgule', lv: ['CM1', 'CM2'] },
+      { t: 'Comparer, ranger, encadrer', lv: ['CM1', 'CM2'] },
+      { t: 'La demi-droite graduée décimale', lv: ['CM1', 'CM2'] },
+      { t: 'Addition et soustraction de décimaux', lv: ['CM1', 'CM2'] },
+      { t: '× 10, × 100, ÷ 10', lv: ['CM2'] },
+      { t: 'Décimal × entier', lv: ['CM1', 'CM2'] },
+    ],
+    exos: ['fracvirgule', 'dectableau', 'deccomp', 'decranger', 'decencadrer', 'decarrondi', 'decdroite', 'declire', 'decpose', 'decfois', 'decmul', 'probdec'],
+  },
+  {
     slug: 'proportionnalite', n: 7, title: 'La proportionnalité', short: 'Proportionnalité',
     notions: [
       { t: 'Le prix de plusieurs objets pareils', lv: ['CE2', 'CM1', 'CM2'] },

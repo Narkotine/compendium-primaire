@@ -29,7 +29,11 @@ import { fracpb } from './frac/histoires';
 import { probfrac } from './probfrac';
 import { linmul, linadd, propoupas } from './prop';
 import { probprop } from './probprop';
+import { fracvirgule, dectableau } from './dec/ecriture';
+import { deccomp, decranger, decencadrer, decarrondi } from './dec/comparer';
+import { decdroite, declire } from './dec/droite';
+import { decpose, decfois, decmul } from './dec/calculs';
+import { probdec } from './dec/probdec';
 import type { ExoType } from '../engine/types';
-/** Exercices du chapitre 1, dans l'ordre des notions du cours. */
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
-export const EXOS: Record<string, ExoType<any, any>> = { echanger, tableau, dizaines, ranger, droite, lire, grands, suites, complements, mental, addpose, subpose, probadd, rectangle, tables, doubles, fois10, mulpose, multiples, probmul, partage, famille, reste, divpose, divisible, probdiv, partsegales, colorier, lirefrac, fracdroite, fraclire, egales, fraccomp, entierfrac, fracsomme, fracquant, fracpb, probfrac, linmul, linadd, propoupas, probprop };
+export const EXOS: Record<string, ExoType<any, any>> = { echanger, tableau, dizaines, ranger, droite, lire, grands, suites, complements, mental, addpose, subpose, probadd, rectangle, tables, doubles, fois10, mulpose, multiples, probmul, partage, famille, reste, divpose, divisible, probdiv, partsegales, colorier, lirefrac, fracdroite, fraclire, egales, fraccomp, entierfrac, fracsomme, fracquant, fracpb, probfrac, linmul, linadd, propoupas, probprop, fracvirgule, dectableau, deccomp, decranger, decencadrer, decarrondi, decdroite, declire, decpose, decfois, decmul, probdec };

@@ -20,6 +20,10 @@ import { fracdroite, fraccomp } from '../src/exos/frac/nombres';
 import { fracsomme } from '../src/exos/frac/calculs';
 import { linmul, propoupas } from '../src/exos/prop';
 import { divpose, steps } from '../src/exos/divpose';
+import { deccomp } from '../src/exos/dec/comparer';
+import { decpose, decfois } from '../src/exos/dec/calculs';
+import { fracvirgule } from '../src/exos/dec/ecriture';
+import { fmtDec } from '../src/engine/dec';
 
 const BASE = process.argv[2] || 'http://localhost:4174/compendium-primaire/';
 const W = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -334,8 +338,58 @@ console.log('Chapitre 7 : proportionnalité');
   await p.click('#check'); await W(60);
   t((await fb()).includes('Bravo'), 'propoupas : situations choisies');
 }
+console.log('Chapitre 6 : décimaux');
+{
+  const fb = () => p.$eval('.fb', (x) => x.textContent || '');
+  // deccomp : piège 2,15 vs 2,9 style
+  let s = 1; let d = deccomp.generate('CM1', 2, s);
+  while (!(d.a.s !== d.b.s && Math.trunc(d.a.n / 10 ** d.a.s) === Math.trunc(d.b.n / 10 ** d.b.s)) && s < 80) d = deccomp.generate('CM1', 2, ++s);
+  await open(`#/exo/deccomp/CM1/2/${s}`);
+  const fa = Math.abs(d.a.n) % 10 ** d.a.s, fb2 = Math.abs(d.b.n) % 10 ** d.b.s;
+  const wrong = (fa > fb2 ? '>' : fa < fb2 ? '<' : '=');
+  const good = deccomp.solution(d);
+  if (wrong !== good) {
+    await p.click(`.cmp [data-s="${wrong}"]`); await p.click('#check'); await W(60);
+    t(/dixièmes|taille de part/.test(await fb()), 'deccomp : piège « 37 > 5 » → message ciblé', await fb());
+  }
+  await p.click(`.cmp [data-s="${good}"]`); await p.click('#check'); await W(60);
+  t((await fb()).includes('Bravo'), 'deccomp : comparaison juste acceptée');
+  // decpose : alignement
+  s = 1; let dp = decpose.generate('CM1', 2, s);
+  while (dp.a.s === dp.b.s && s < 60) dp = decpose.generate('CM1', 2, ++s);
+  await open(`#/exo/decpose/CM1/2/${s}`);
+  const as = fmtDec(dp.a).replace(',', '').replace(/\u202f/g, '');
+  const bs = fmtDec(dp.b).replace(',', '').replace(/\u202f/g, '');
+  const trap = String(dp.op === '+' ? Number(as) + Number(bs) : Math.abs(Number(as) - Number(bs)));
+  for (const ch of trap) await p.click(`.kp-k[data-k="${ch}"]`);
+  await p.click('#check'); await W(60);
+  t(/aligne|virgule/i.test(await fb()) || trap === decpose.solution(dp).replace(',', ''), 'decpose : alignement à droite → message', await fb());
+  // clear and type good answer
+  for (let i = 0; i < 12; i++) await p.click('.kp-k[data-k="del"]');
+  for (const ch of decpose.solution(dp)) await p.click(`.kp-k[data-k="${ch === ',' ? ',' : ch}"]`);
+  await p.click('#check'); await W(60);
+  t((await fb()).includes('Bravo'), 'decpose : résultat juste accepté', await fb());
+  // fracvirgule
+  const fv = fracvirgule.generate('CM1', 1, 4);
+  await open('#/exo/fracvirgule/CM1/1/4');
+  if (fv.kind === 'frac→virgule' || fv.kind === 'somme→virgule') {
+    for (const ch of fmtDec(fv.d)) await p.click(`.kp-k[data-k="${ch === ',' ? ',' : ch}"]`);
+    await p.click('#check'); await W(60);
+    t((await fb()).includes('Bravo'), 'fracvirgule : écriture à virgule acceptée', await fb());
+  } else {
+    t(true, 'fracvirgule : autre forme (sautée en e2e)');
+  }
+  // decfois piège zéro (CM2)
+  s = 1; let df = decfois.generate('CM2', 1, s);
+  while (!(df.op === '×' && df.d.s > 0) && s < 40) df = decfois.generate('CM2', 1, ++s);
+  await open(`#/exo/decfois/CM2/1/${s}`);
+  const fake = fmtDec(df.d).includes(',') ? fmtDec(df.d) + '0' : fmtDec(df.d) + ',0';
+  for (const ch of fake) await p.click(`.kp-k[data-k="${ch === ',' ? ',' : ch}"]`);
+  await p.click('#check'); await W(60);
+  t(/zéro|glissent|rang/i.test(await fb()), 'decfois : « ajouter un zéro » → message', await fb());
+}
 // cibles ≥ 44 px
-for (const h of ['', '#/reglages', '#/exo/echanger/CE2/2/1', '#/exo/tableau/CE2/3/1', '#/exo/ranger/CE2/3/1', '#/exo/droite/CE1/2/1', '#/exo/droite/CE2/3/1', '#/exo/dizaines/CE2/3/1', '#/exo/droite/CM2/1/3', '#/exo/grands/CM2/3/1', '#/exo/suites/CE2/3/1', '#/exo/ranger/CM2/3/2', '#/cours/numeration', '#/exo/lire/CE2/2/1', '#/exo/addpose/CM1/3/3', '#/exo/subpose/CM1/3/3', '#/exo/probadd/CM2/3/4', '#/exo/complements/CE2/2/2', '#/exo/mental/CM1/3/2', '#/cours/addition', '#/cours/multiplication', '#/exo/mulpose/CM2/3/1', '#/exo/mulpose/CE2/1/1', '#/exo/multiples/CM1/3/2', '#/exo/rectangle/CE2/3/1', '#/exo/tables/CE2/3/1', '#/exo/fois10/CM2/3/1', '#/exo/doubles/CE1/3/1', '#/exo/probmul/CM2/3/5', '#/cours/division', '#/exo/partage/CE2/2/3', '#/exo/divpose/CM2/3/2', '#/exo/reste/CM1/2/1', '#/exo/famille/CE2/1/1', '#/exo/divisible/CM2/3/1', '#/exo/probdiv/CM1/3/2', '#/cours/fractions', '#/exo/partsegales/CE1/3/2', '#/exo/colorier/CM2/3/1', '#/exo/colorier/CE2/3/7', '#/exo/lirefrac/CE2/2/2', '#/exo/fracdroite/CM2/3/4', '#/exo/fraclire/CM1/3/1', '#/exo/egales/CM2/3/1', '#/exo/egales/CE2/2/1', '#/exo/fraccomp/CM1/3/1', '#/exo/entierfrac/CM1/3/1', '#/exo/entierfrac/CM2/2/2', '#/exo/fracsomme/CM2/3/1', '#/exo/fracquant/CM2/3/1', '#/exo/fracpb/CE2/3/1', '#/exo/probfrac/CM2/3/2', '#/cours/proportionnalite', '#/exo/linmul/CM2/3/2', '#/exo/linadd/CM1/3/1', '#/exo/propoupas/CM1/1/4', '#/exo/probprop/CM2/3/3', '#/exo/probprop/CE2/2/1']) {
+for (const h of ['', '#/reglages', '#/exo/echanger/CE2/2/1', '#/exo/tableau/CE2/3/1', '#/exo/ranger/CE2/3/1', '#/exo/droite/CE1/2/1', '#/exo/droite/CE2/3/1', '#/exo/dizaines/CE2/3/1', '#/exo/droite/CM2/1/3', '#/exo/grands/CM2/3/1', '#/exo/suites/CE2/3/1', '#/exo/ranger/CM2/3/2', '#/cours/numeration', '#/exo/lire/CE2/2/1', '#/exo/addpose/CM1/3/3', '#/exo/subpose/CM1/3/3', '#/exo/probadd/CM2/3/4', '#/exo/complements/CE2/2/2', '#/exo/mental/CM1/3/2', '#/cours/addition', '#/cours/multiplication', '#/exo/mulpose/CM2/3/1', '#/exo/mulpose/CE2/1/1', '#/exo/multiples/CM1/3/2', '#/exo/rectangle/CE2/3/1', '#/exo/tables/CE2/3/1', '#/exo/fois10/CM2/3/1', '#/exo/doubles/CE1/3/1', '#/exo/probmul/CM2/3/5', '#/cours/division', '#/exo/partage/CE2/2/3', '#/exo/divpose/CM2/3/2', '#/exo/reste/CM1/2/1', '#/exo/famille/CE2/1/1', '#/exo/divisible/CM2/3/1', '#/exo/probdiv/CM1/3/2', '#/cours/fractions', '#/exo/partsegales/CE1/3/2', '#/exo/colorier/CM2/3/1', '#/exo/colorier/CE2/3/7', '#/exo/lirefrac/CE2/2/2', '#/exo/fracdroite/CM2/3/4', '#/exo/fraclire/CM1/3/1', '#/exo/egales/CM2/3/1', '#/exo/egales/CE2/2/1', '#/exo/fraccomp/CM1/3/1', '#/exo/entierfrac/CM1/3/1', '#/exo/entierfrac/CM2/2/2', '#/exo/fracsomme/CM2/3/1', '#/exo/fracquant/CM2/3/1', '#/exo/fracpb/CE2/3/1', '#/exo/probfrac/CM2/3/2', '#/cours/proportionnalite', '#/exo/linmul/CM2/3/2', '#/exo/linadd/CM1/3/1', '#/exo/propoupas/CM1/1/4', '#/exo/probprop/CM2/3/3', '#/exo/probprop/CE2/2/1', '#/cours/decimaux', '#/exo/fracvirgule/CM1/1/4', '#/exo/dectableau/CM1/2/1', '#/exo/deccomp/CM1/2/3', '#/exo/decranger/CM2/3/1', '#/exo/decencadrer/CM1/2/1', '#/exo/decarrondi/CM1/1/2', '#/exo/decdroite/CM1/2/1', '#/exo/declire/CM2/2/1', '#/exo/decpose/CM1/2/2', '#/exo/decfois/CM2/2/1', '#/exo/decmul/CM2/2/1', '#/exo/probdec/CM1/2/1']) {
   for (const w of [360, 390]) {
     await p.setViewport({ width: w, height: 740, isMobile: true, hasTouch: true });
     await open(h);
