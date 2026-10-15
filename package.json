@@ -3,7 +3,7 @@
   "version": "0.13.1",
   "private": true,
   "type": "module",
-  "description": "PWA hors ligne : maths primaire (CE1-CM2), pilote chapitre 1 Numération",
+  "description": "PWA hors ligne : maths primaire (CE1–CM2 + 6e), 9 chapitres, exercices générés",
   "scripts": {
     "content": "node scripts/build-content.mjs",
     "icons": "node scripts/make-icons.mjs",
@@ -12,7 +12,8 @@
     "preview": "vite preview --port 4174 --strictPort",
     "test": "tsx tests/props.test.ts 2000 && tsx tests/generic.test.ts 500",
     "test:e2e": "tsx scripts/e2e.mts",
-    "captures": "tsx scripts/captures.mts"
+    "captures": "tsx scripts/captures.mts",
+    "publish:gh": "bash scripts/publish-gh.sh"
   },
   "devDependencies": {
     "@fontsource/atkinson-hyperlegible-next": "^5.3.0",

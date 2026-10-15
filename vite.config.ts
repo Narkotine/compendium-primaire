@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 import { VitePWA } from 'vite-plugin-pwa';
 
-// Prévu pour GitHub Pages : https://narkotine.github.io/compendium-primaire/ (rien n'est publié pour l'instant)
+// GitHub Pages : https://narkotine.github.io/compendium-primaire/ (même origine que collège + jeux)
 export default defineConfig({
   base: '/compendium-primaire/',
   build: { target: 'es2020', assetsInlineLimit: 0 },
@@ -29,6 +29,7 @@ export default defineConfig({
       },
       workbox: {
         globPatterns: ['**/*.{js,css,html,svg,png,woff2,webmanifest}'],
+        globIgnores: ['**/404.html'],
         cacheId: 'compendium-primaire',
         cleanupOutdatedCaches: true,
         navigateFallback: 'index.html',
