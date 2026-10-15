@@ -64,4 +64,14 @@ export const CHAPTERS: Chapter[] = [
     ],
     exos: ['fracpb', 'probfrac', 'partsegales', 'colorier', 'lirefrac', 'fraccomp', 'fracsomme', 'egales', 'fracdroite', 'fraclire', 'entierfrac', 'fracquant'],
   },
+  {
+    slug: 'proportionnalite', n: 7, title: 'La proportionnalité', short: 'Proportionnalité',
+    notions: [
+      { t: 'Le prix de plusieurs objets pareils', lv: ['CE2', 'CM1', 'CM2'] },
+      { t: 'Proportionnel ou pas ?', lv: ['CM1', 'CM2'] },
+      { t: 'Fois plus, fois moins', lv: ['CM1', 'CM2'] },
+      { t: 'Ajouter deux situations', lv: ['CM1', 'CM2'] },
+    ],
+    exos: ['probprop', 'propoupas', 'linmul', 'linadd'],
+  },
 ];

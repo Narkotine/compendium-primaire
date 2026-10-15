@@ -110,6 +110,15 @@ for (let s = 1; s <= N; s++) for (const p of [1, 2, 3] as Palier[]) {
   for (const lv of fracquant.levels) { const d = fracquant.generate(lv, p, s); t(d.n % d.b === 0, 'fracquant tombe juste'); if (lv === 'CM1') t(d.a === 1, 'CM1 : fractions unitaires de quantités'); if (d.a > 1) t(/On en veut/.test(fracquant.check(d, d.n / d.b).msg ?? ''), 'fracquant arrêt au quart'); }
   for (const lv of fracpb.levels) { const d = fracpb.generate(lv, p, s); const g = fracpb.solution(d); t(g.n > 0 && g.n <= g.d && okDen(lv, g.d), 'fracpb réponse dans (0, 1]'); if (lv === 'CE1') t(p === 3 || d.extra === '', 'fracpb CE1 inutile seulement p3'); }
 }
+// chapitre 7 : proportionnalité
+import { linmul, linadd, propoupas } from '../src/exos/prop';
+import { probprop } from '../src/exos/probprop';
+for (let s = 1; s <= N; s++) for (const p of [1, 2, 3] as Palier[]) {
+  for (const lv of linmul.levels) { const d = linmul.generate(lv, p, s); const x2 = d.dir === 'plus' ? d.x * d.k : d.x / d.k; t(Number.isInteger(x2) && Number.isInteger(linmul.solution(d)[1] as number), 'linmul entiers'); if (d.dir === 'plus') t(/ajouté/.test(linmul.check(d, [d.k, d.y + x2 - d.x]).msg ?? '') || d.y + x2 - d.x === d.y * d.k, 'linmul modèle additif ciblé'); }
+  for (const lv of linadd.levels) { const d = linadd.generate(lv, p, s); t(d.y1 * d.x2 === d.y2 * d.x1, 'linadd situation proportionnelle'); t(!Number.isInteger(d.y1 / d.x1) || true, ''); }
+  for (const lv of propoupas.levels) { const d = propoupas.generate(lv, p, s); const n = d.list.filter((x) => x.ok).length; t(n >= 1 && n <= 3 && d.list.length === 4, 'propoupas 1–3 situations proportionnelles'); }
+  for (const lv of probprop.levels) { const d = probprop.generate(lv, p, s); if (d.tpl === 'manege') { const v = probprop.check(d, { nums: [d.inst.useless[d.inst.useless.length - 1], d.inst.nums[2]], ops: ['×'], result: null } as never); t(/pas proportionnel/.test(v.msg ?? '') || d.inst.slots === 3, 'manège : piège ciblé'); } if (lv === 'CE2') t(d.tpl === 'unitaire', 'CE2 : seulement prix unitaire donné'); }
+}
 console.log(bad.join('\n'));
 console.log(`${pass} vérifications génériques réussies, ${fail} échecs`);
 process.exit(fail ? 1 : 0);

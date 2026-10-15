@@ -24,6 +24,8 @@ export interface PbInst {
   /** diagnostic d'un calcul faux (nombres utiles bien choisis), ou null */
   diag?: (nums: number[], ops: string[]) => string | null;
   hint: string;
+  /** message propre à une donnée « piège » (ex. le prix de 3 tours, qui n'est pas proportionnel) */
+  uselessDiag?: (n: number) => string | null;
   /** valeur du bon calcul quand elle diffère de la réponse (division avec reste : 189 ÷ 10 = 18,9 → 19 pages) */
   exprValue?: number;
   /** diagnostic d'un résultat faux (calcul juste) */
@@ -57,7 +59,7 @@ export function makeProblemExo(id: string, title: string, notion: string, levels
   const phase = (d: PbData, a: { nums: number[]; ops: string[] }) => {
     const i = d.inst;
     const usedUseless = a.nums.filter((n) => i.useless.includes(n) && !i.nums.includes(n));
-    if (usedUseless.length) return { ok: false, msg: `Le nombre ${fmt(usedUseless[0])} ne sert pas à répondre à la question. Relis ce qu’on cherche.` };
+    if (usedUseless.length) return { ok: false, msg: i.uselessDiag?.(usedUseless[0]) ?? `Le nombre ${fmt(usedUseless[0])} ne sert pas à répondre à la question. Relis ce qu’on cherche.` };
     if (!sameMultiset(a.nums, i.nums)) return { ok: false, msg: `Utilise tous les nombres utiles de l’énoncé, chacun une fois.` };
     const v = evalExpr(a.nums, a.ops);
     if (Math.abs(v - (i.exprValue ?? i.answer)) < 1e-9) return { ok: true };

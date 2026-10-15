@@ -193,3 +193,10 @@ table.mini th { font-size: 12px; color: var(--text-2); }
 .cmp { display: flex; justify-content: center; gap: 10px; margin: 10px 0; } .cmp .tok { min-width: 64px; font-size: 30px; }
 .w-figs .pk-c { width: calc(50% - 6px); min-height: 120px; padding: 6px; }
 .w-figs .pk-c .ff { max-height: 110px; width: auto; }
+/* chapitre 7 : phrases à trous */
+.st-l { font-size: 18px; line-height: 2.6; margin: 4px 0; }
+.st-h { min-width: 64px; height: 46px; vertical-align: middle; border-radius: 10px; border: 2px solid var(--border-strong); background: var(--surface); font-size: 22px; font-weight: 700; padding: 0 8px; margin: 0 2px; }
+.st-h.act { border-color: var(--accent); box-shadow: 0 0 0 3px var(--accent); }
+.st-h.bad { background: color-mix(in srgb, var(--ko) 18%, var(--surface)); border-color: var(--ko); }
+.sit { text-align: left; font-size: 16px; font-weight: 500; line-height: 1.35; min-height: 56px; padding: 8px 10px; width: 100%; }
+.w-sit .pk { flex-direction: column; } .w-sit .pk-c { width: 100%; }

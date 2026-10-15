@@ -13,6 +13,7 @@ const chapters = [
   { slug: 'multiplication', dir: '03-multiplication', n: 3 },
   { slug: 'division', dir: '04-division', n: 4 },
   { slug: 'fractions', dir: '05-fractions', n: 5 },
+  { slug: 'proportionnalite', dir: '07-proportionnalite', n: 7 },
 ];
 const out = [];
 for (const c of chapters) {
