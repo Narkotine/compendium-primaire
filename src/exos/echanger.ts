@@ -70,10 +70,15 @@ export const echanger: ExoType<EchData, number> = {
   },
   mount(el, d) {
     el.innerHTML = `<p class="q">Voici <b>${desc(d.counts)}</b>.<br>Quel est ce nombre ?</p>
-      <p class="tip">Tu peux échanger : glisse une pièce vers la colonne voisine, ou utilise les boutons.</p>
+      <p class="tip">${d.p === 1 ? 'Fais d’abord les échanges' : 'Tu peux échanger'} : glisse une pièce vers la colonne voisine, ou utilise les boutons.</p>
       <div class="w-mat"></div><div class="w-kp"></div>`;
     const m = material(el.querySelector('.w-mat')!, d.counts);
     const k = keypad(el.querySelector('.w-kp')!, 'Ta réponse');
-    return { answer: () => k.value(), lock: () => { m.lock(); k.lock(); } };
+    return {
+      answer: () => k.value(),
+      // palier 1 : le matériel est mis en avant, on fait d'abord tous les échanges (sans pénalité)
+      ready: () => (d.p === 1 && m.counts().some((x, i) => x >= 10 && i < d.counts.length - 1) ? 'Au début, on fait les échanges avec le matériel : il reste une colonne avec 10 pièces ou plus.' : null),
+      lock: () => { m.lock(); k.lock(); },
+    };
   },
 };

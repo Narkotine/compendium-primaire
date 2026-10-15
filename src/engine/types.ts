@@ -14,7 +14,7 @@ export const unitName = (k: number, n: number) => (n > 1 ? UNITS[k].many : UNITS
 export const nCols = (lv: Level) => (lv === 'CE1' ? 3 : 4);
 
 export interface Verdict { ok: boolean; msg?: string; /** cases à signaler (index de colonne) */ bad?: number[] }
-export interface Mounted<A> { answer(): A | null; lock(): void; showBad?(cols: number[]): void }
+export interface Mounted<A> { answer(): A | null; lock(): void; showBad?(cols: number[]): void; /** message si la réponse ne peut pas encore être vérifiée (sans pénalité) */ ready?(): string | null }
 export interface ExoType<D, A> {
   id: string;
   title: string;

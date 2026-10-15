@@ -3,6 +3,9 @@
 import puppeteer, { type Page } from 'puppeteer-core';
 import { echanger } from '../src/exos/echanger';
 import { tableau } from '../src/exos/tableau';
+import { ranger } from '../src/exos/ranger';
+import { droite } from '../src/exos/droite';
+import { dizaines } from '../src/exos/dizaines';
 
 const BASE = process.argv[2] || 'http://localhost:4174/compendium-primaire/';
 const W = (ms: number) => new Promise((r) => setTimeout(r, ms));
@@ -82,9 +85,89 @@ await p.focus('.nt-cell[data-col="0"]'); await p.keyboard.press('Enter'); await 
 await p.click('#check'); await W(80);
 t((await p.$eval('.fb', (x) => x.textContent || '')).includes('Bravo'), 'clavier + vérification : juste au 1er essai');
 t((await p.$$eval('.dots i.on', (x) => x.length)) === 1 || (await p.$eval('.exo-head', (x) => x.textContent || '')).includes('★'), 'série à 1 après une réussite au 1er essai');
+
+console.log('Échanger palier 1 : échanges d’abord');
+{
+  const e1 = echanger.generate('CE1', 1, 21);
+  await open('#/exo/echanger/CE1/1/21');
+  await typeNumber(e1.n); await p.click('#check'); await W(60);
+  t((await p.$eval('.fb', (x) => x.textContent || '')).includes('échanges'), 'palier 1 : rappel de faire les échanges, sans pénalité');
+  await p.click('.mat-u [data-g]'); await W(60);
+  await p.click('#check'); await W(60);
+  t((await p.$eval('.fb', (x) => x.textContent || '')).includes('Bravo'), 'après l’échange : juste au 1er essai');
+  t((await p.$$eval('.dots i.on', (x) => x.length)) === 1, 'la série monte (le rappel n’a pas compté comme erreur)');
+}
+console.log('Ranger (CE1, palier 2, graine 3)');
+{
+  const r = ranger.generate('CE1', 2, 3);
+  const sol = ranger.solution(r);
+  await open('#/exo/ranger/CE1/2/3');
+  const cur = () => p.$$eval('.ord-it', (xs) => xs.map((x) => Number((x as HTMLElement).dataset.item)));
+  for (let k = 0; k < sol.length; k++) {
+    const o = await cur();
+    const from = o.indexOf(sol[k]);
+    if (from === k) continue;
+    if (k % 3 === 0) await touchDrag(await center('.ord-card', from), await center('.ord-it', k));
+    else if (k % 3 === 1) await mouseDrag(await center('.ord-card', from), await center('.ord-it', k));
+    else for (let j = from; j > k; j--) { await p.click(`[data-up="${j}"]`); await W(40); }
+  }
+  t((await cur()).join() === sol.join(), 'doigt, souris et flèches : cartes rangées', await cur());
+  await p.click('#check'); await W(60);
+  t((await p.$eval('.fb', (x) => x.textContent || '')).includes('Bravo'), 'rangement accepté');
+}
+console.log('Demi-droite (CE1, palier 2) : placer');
+{
+  let s = 1, g = droite.generate('CE1', 2, s);
+  while (g.k < 3 || g.k > 8) g = droite.generate('CE1', 2, ++s);
+  await open(`#/exo/droite/CE1/2/${s}`);
+  const tickX = (k: number) => p.evaluate((k) => { const sv = document.querySelector('.nl-svg')!; sv.scrollIntoView({ block: 'center' }); const r = sv.getBoundingClientRect(); return { x: r.left + ((20 + k * 30) * r.width) / 340, y: r.top + (50 * r.height) / 110 }; }, k);
+  const pos = () => p.$eval('.nl-svg', (x) => Number(x.getAttribute('aria-valuenow')));
+  // doigt : toucher près de la graduation k-1 (un peu à côté : aimantation)
+  const a = await tickX(g.k - 1);
+  await touchDrag({ x: a.x + 6, y: a.y }, { x: a.x + 8, y: a.y });
+  t((await pos()) === g.k - 1, 'doigt : toucher la droite place la flèche (aimantée)', await pos());
+  // souris : glisser jusqu'à k+1
+  await mouseDrag(await tickX(g.k - 1), await tickX(g.k + 1));
+  t((await pos()) === g.k + 1, 'souris : glisser la flèche', await pos());
+  // vérification fausse (décalage d'un) puis clavier ←
+  await p.click('#check'); await W(60);
+  t((await p.$eval('.fb', (x) => x.textContent || '')).includes('espaces'), 'message ciblé : compter les espaces');
+  await p.$eval('.nl-svg', (x) => (x as unknown as HTMLElement).focus()); await p.keyboard.press('ArrowLeft'); await W(40);
+  t((await pos()) === g.k, 'clavier : flèche gauche', await pos());
+  await p.click('#check'); await W(60);
+  t((await p.$eval('.fb', (x) => x.textContent || '')).includes('Bravo'), 'placement juste accepté au 2e essai');
+  t((await p.$eval('#next', (x) => x.textContent || '')).includes('jumeau'), '2e essai : on propose un exercice jumeau');
+}
+console.log('Demi-droite palier 3 (lire) et dizaines');
+{
+  const g = droite.generate('CE2', 3, 5);
+  await open('#/exo/droite/CE2/3/5');
+  await typeNumber(droite.solution(g)); await p.click('#check'); await W(60);
+  t((await p.$eval('.fb', (x) => x.textContent || '')).includes('Bravo'), 'lire un point : réponse au pavé');
+  const z = dizaines.generate('CE1', 2, 9);
+  await open('#/exo/dizaines/CE1/2/9');
+  await typeNumber(Math.floor(z.n / 10) % 10); await p.click('#check'); await W(60);
+  t((await p.$eval('.fb', (x) => x.textContent || '')).includes('colonnes de gauche'), 'dizaines : message ciblé (chiffre au lieu du nombre)');
+}
+console.log('Réglages : chronomètre désactivé par défaut');
+{
+  await open('#/exo/dizaines/CE1/1/1');
+  t(!(await p.$('.chrono')), 'pas de chrono par défaut');
+  await open('#/reglages'); await p.click('#chrono'); await W(50);
+  await open('#/exo/dizaines/CE1/1/1');
+  t(!!(await p.$('.chrono')), 'chrono affiché après activation');
+  await open('#/reglages'); await p.click('#chrono'); await W(50);
+}
 // cibles ≥ 44 px
-const small = await p.$$eval('button, a', (els) => els.filter((e) => { const r = e.getBoundingClientRect(); return r.width > 0 && (r.width < 44 || r.height < 44); }).map((e) => e.className));
-t(small.length === 0, 'cibles tactiles ≥ 44 px', small);
+for (const h of ['', '#/reglages', '#/exo/echanger/CE2/2/1', '#/exo/tableau/CE2/3/1', '#/exo/ranger/CE2/3/1', '#/exo/droite/CE1/2/1', '#/exo/droite/CE2/3/1', '#/exo/dizaines/CE2/3/1']) {
+  for (const w of [360, 390]) {
+    await p.setViewport({ width: w, height: 740, isMobile: true, hasTouch: true });
+    await open(h);
+    const small = await p.$$eval('button, a, input', (els) => els.filter((e) => { const r = (e.closest('label') ?? e).getBoundingClientRect(); return r.width > 0 && (r.width < 44 || r.height < 44); }).map((e) => e.className || e.tagName));
+    const overflow = await p.evaluate(() => document.documentElement.scrollWidth > innerWidth + 1);
+    t(small.length === 0 && !overflow, `cibles ≥ 44 px, pas de débordement : ${h || 'accueil'} à ${w} px`, { small, overflow });
+  }
+}
 t(errors.length === 0, 'aucune erreur JS', errors);
 await b.close();
 console.log(`${pass} réussis, ${fail} échecs`);

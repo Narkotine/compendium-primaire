@@ -78,3 +78,27 @@ main { max-width: 760px; margin: 0 auto; padding: 12px 12px calc(32px + var(--sa
 .toast { pointer-events: auto; display: flex; gap: 12px; align-items: center; background: var(--text); color: var(--bg); padding: 10px 14px; border-radius: 12px; font-size: 15px; max-width: 92vw; }
 .toast-btn { min-height: 44px; border: 0; border-radius: 10px; background: var(--accent); color: var(--on-accent); font-weight: 700; padding: 0 12px; }
 @media (max-width: 380px) { .mat-h { font-size: 12.5px; } .mb { font-size: 12.5px; } .pc-c { width: 36px; height: 36px; } }
+.card h3 { margin: 16px 0 4px; font-size: 18px; }
+.due { color: #b86e00; font-weight: 700; margin-left: 2px; }
+.due-card { border-color: #e0a21b; } .due-l { display: flex; flex-wrap: wrap; gap: 8px; }
+.opt { display: flex; align-items: center; gap: 10px; min-height: 48px; font-size: 18px; } .opt input { width: 24px; height: 24px; }
+.btn-2 { background: var(--surface-2); color: var(--text); border: 1px solid var(--border-strong); }
+.chrono { margin-left: auto; font-variant-numeric: tabular-nums; color: var(--text-2); }
+.big { font-size: 28px; } .dim { opacity: .35; }
+/* rangement */
+.ord-end { font-size: 14px; color: var(--text-2); text-align: center; margin: 4px 0; }
+.ord-l { list-style: none; margin: 0; padding: 0; display: grid; gap: 8px; }
+.ord-it { display: flex; align-items: center; gap: 8px; border-radius: 12px; }
+.ord-it.over .ord-card { border-color: var(--accent); background: var(--accent-soft); }
+.ord-it.bad .ord-card { border-color: var(--ko); background: color-mix(in srgb, var(--ko) 14%, var(--surface)); }
+.ord-card { flex: 1; min-height: 56px; display: grid; place-items: center; font-size: 26px; font-weight: 700; border: 2px solid var(--border-strong); border-radius: 12px; background: var(--surface-2); cursor: grab; user-select: none; }
+.ord-card.dragging { opacity: .35; }
+.ord-btns { display: flex; gap: 6px; }
+.ob { min-width: 48px; min-height: 48px; border-radius: 12px; border: 1px solid var(--border-strong); background: var(--surface-2); font-size: 22px; font-weight: 700; }
+.ob:disabled { opacity: .35; }
+/* demi-droite */
+.nl-svg { width: 100%; height: auto; background: var(--fig-bg); border-radius: 12px; cursor: pointer; }
+.nl-axis, .nl-tick { stroke: #222; stroke-width: 2.5; } .nl-lab { font: 700 15px var(--font); text-anchor: middle; fill: #111; }
+.nl-cur path { fill: var(--d); } .nl-mark { fill: #d1495b; } .nl-q { font: 700 20px var(--font); text-anchor: middle; fill: #d1495b; }
+.nl-good { fill: #1f7a3d; }
+.nl-btns { display: flex; align-items: center; justify-content: space-between; gap: 8px; margin-top: 8px; } .nl-help { font-size: 14px; color: var(--text-2); text-align: center; }

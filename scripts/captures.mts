@@ -28,4 +28,15 @@ await shot('04-tableau-erreur-360x640-clair', 360, 640, 'light', '#/exo/tableau/
   for (let j = 0; j < 3; j++) { const i = d.pool.findIndex((x, q) => x === typed[j] && !used.has(q)); used.add(i); await p.click(`.nt-pool .tok[data-tok="${i}"]`); await p.click(`.nt-cell[data-col="${2 - j}"]`); }
   await p.click('#check'); await W(100); await p.evaluate(() => document.querySelector('.fb')!.scrollIntoView({ block: 'end' }));
 });
+await shot('05-ranger-360x640-sombre', 360, 640, 'dark', '#/exo/ranger/CE2/3/8');
+await shot('06-droite-390x844-clair', 390, 844, 'light', '#/exo/droite/CE1/2/4', async (p) => {
+  const r = await p.$eval('.nl-svg', (x) => { const b = x.getBoundingClientRect(); return { x: b.left, y: b.top, w: b.width, h: b.height }; });
+  await p.mouse.click(r.x + ((20 + 5 * 30) * r.w) / 340, r.y + r.h / 2);
+});
+await shot('07-dizaines-erreur-390x844-sombre', 390, 844, 'dark', '#/exo/dizaines/CE2/2/3', async (p) => {
+  const { dizaines } = await import('../src/exos/dizaines');
+  const z = dizaines.generate('CE2', 2, 3);
+  for (const ch of String(Math.floor(z.n / 10 ** z.unit) % 10)) await p.click(`.kp-k[data-k="${ch}"]`);
+  await p.click('#check'); await p.click('#check');
+});
 await b.close();
