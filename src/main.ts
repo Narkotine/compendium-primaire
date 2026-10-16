@@ -19,7 +19,7 @@ let timer: number | undefined;
 function shell(title: string, body: string, back?: string) {
   clearInterval(timer);
   app.innerHTML = `<header class="bar">${back ? `<a class="ib" href="${back}" aria-label="Retour">←</a>` : '<span class="logo" aria-hidden="true"></span>'}
-    <h1 class="bar-t">${title}</h1><a class="ib" href="#/reglages" aria-label="Réglages">⚙</a></header>
+    <h1 class="bar-t">${title}</h1><a class="ib" href="#/sommaire" aria-label="Sommaire" title="Sommaire">☰</a><a class="ib" href="#/reglages" aria-label="Réglages">⚙</a></header>
     <main id="main" tabindex="-1">${body}</main>`;
   scrollTo(0, 0);
 }
@@ -27,9 +27,28 @@ function exoRows(ids: string[]) {
   return ids.map((id) => EXOS[id]).map((e) => `<div class="exo-row"><div class="exo-t">${e.title}<small>${e.notion}</small></div><div class="exo-lv">${e.levels.map((l: Level) =>
     `<a class="btn-lv" href="#/exo/${e.id}/${l}">${lvTag(l)} ${starStr(stars(getMastery(e.id, l)))}${isDue(getMastery(e.id, l)) ? '<span class="due" title="À réviser">↻</span>' : ''}</a>`).join('')}</div></div>`).join('');
 }
+/** Parties du cours (titres h2) : texte sans badges + badges de niveau. */
+function sections(slug: string) {
+  const out: { t: string; lv: string[] }[] = [];
+  const re = /<h2[^>]*>([\s\S]*?)<\/h2>/g; let m: RegExpExecArray | null;
+  while ((m = re.exec(COURS[slug] ?? ''))) {
+    const lv = [...m[1].matchAll(/lv-([A-Za-z0-9]+)/g)].map((x) => x[1]);
+    const d = document.createElement('div'); d.innerHTML = m[1].replace(/<span class="lv[^"]*">[^<]*<\/span>/g, '');
+    out.push({ t: (d.textContent ?? '').trim(), lv });
+  }
+  return out;
+}
+function sommaire() {
+  shell('Sommaire', `<p class="small muted">Touche un titre pour aller directement au cours ou à l’exercice.</p>
+    <nav aria-label="Sommaire">${CHAPTERS.map((c) => `<section class="card som" id="som-${c.slug}">
+    <h2><span class="ch-n">${c.n}</span> <a href="#/cours/${c.slug}">${c.title}</a></h2>
+    <h3>📖 Le cours</h3><ol class="som-l">${sections(c.slug).map((x, i) => `<li><a class="som-a" href="#/cours/${c.slug}/${i + 1}">${esc(x.t)} ${x.lv.map(lvTag).join(' ')}</a></li>`).join('')}</ol>
+    <h3>✏️ Les exercices</h3><ul class="som-l som-x">${c.exos.map((id) => EXOS[id]).map((e) => `<li><span class="som-xt">${e.title}</span><span class="som-lv">${e.levels.map((l: Level) => `<a class="btn-lv" href="#/exo/${e.id}/${l}" aria-label="${esc(e.title)}, niveau ${l}">${lvTag(l)}</a>`).join('')}</span></li>`).join('')}</ul>
+    </section>`).join('')}</nav>`, '#/');
+}
 function home() {
   const due = dueList();
-  shell('Maths Primaire', `${due.length ? `<section class="card due-card"><h2>↻ À réviser aujourd’hui</h2><p class="small">Tu avais réussi ces exercices. On vérifie que tu t’en souviens.</p><div class="due-l">${due.map((x) => `<a class="btn-lv" href="#/exo/${x.exo}/${x.lv}">${EXOS[x.exo]?.title ?? x.exo} ${lvTag(x.lv)}</a>`).join('')}</div></section>` : ''}
+  shell('Maths Primaire', `<a class="btn som-btn" href="#/sommaire">☰ Sommaire : tous les chapitres</a>${due.length ? `<section class="card due-card"><h2>↻ À réviser aujourd’hui</h2><p class="small">Tu avais réussi ces exercices. On vérifie que tu t’en souviens.</p><div class="due-l">${due.map((x) => `<a class="btn-lv" href="#/exo/${x.exo}/${x.lv}">${EXOS[x.exo]?.title ?? x.exo} ${lvTag(x.lv)}</a>`).join('')}</div></section>` : ''}
     ${CHAPTERS.map((c) => `<section class="card ch">
     <h2><span class="ch-n">${c.n}</span> ${c.title}</h2>
     <ol class="notions">${c.notions.map((n) => `<li>${n.t} ${n.lv.map(lvTag).join(' ')}</li>`).join('')}</ol>
@@ -37,10 +56,12 @@ function home() {
     <h3>S’entraîner</h3>${exoRows(c.exos)}</section>`).join('')}
     <p class="small muted">★ tu as essayé · ★★ ${GOAL} bonnes réponses de suite du premier coup · ★★★ encore réussi à la révision d’une semaine. Tout est ouvert : commence où tu veux.</p>`);
 }
-function cours(slug: string) {
+function cours(slug: string, part?: number) {
   const c = CHAPTERS.find((x) => x.slug === slug);
   if (!c) return home();
-  shell(c.short, `<article class="prose">${COURS[slug] ?? ''}</article><section class="card"><h2>S’entraîner</h2>${exoRows(c.exos)}</section>`, '#/');
+  shell(c.short, `<article class="prose">${COURS[slug] ?? ''}</article><section class="card" id="exos"><h2>S’entraîner</h2>${exoRows(c.exos)}</section>`, '#/sommaire');
+  app.querySelectorAll('.prose h2').forEach((h, i) => { h.id = `p${i + 1}`; });
+  if (part) { const go = () => app.querySelector<HTMLElement>(`#p${part}`)?.scrollIntoView({ block: 'start' }); requestAnimationFrame(go); app.querySelectorAll('.prose img').forEach((im) => im.addEventListener('load', go, { once: true })); setTimeout(go, 350); }
 }
 function reglages() {
   const s = getSettings();
@@ -100,7 +121,8 @@ function exo(id: string, lv: Level, pForced?: Palier, seedForced?: number) {
 
 function route() {
   const h = location.hash.replace(/^#\/?/, '').split('/');
-  if (h[0] === 'cours' && h[1]) cours(h[1]);
+  if (h[0] === 'cours' && h[1]) cours(h[1], h[2] ? Number(h[2]) : undefined);
+  else if (h[0] === 'sommaire') sommaire();
   else if (h[0] === 'reglages') reglages();
   else if (h[0] === 'exo' && h[1]) exo(h[1], h[2] as Level, h[3] ? (Number(h[3]) as Palier) : undefined, h[4] ? Number(h[4]) : undefined);
   else home();

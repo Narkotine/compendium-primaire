@@ -239,3 +239,14 @@ table.mini th { font-size: 12px; color: var(--text-2); }
 
 .sy[data-axis="D"] { background: linear-gradient(to bottom right, transparent calc(50% - 2px), #d1495b calc(50% - 2px), #d1495b calc(50% + 2px), transparent calc(50% + 2px)); }
 .sy[data-axis="A"] { background: linear-gradient(to bottom left, transparent calc(50% - 2px), #d1495b calc(50% - 2px), #d1495b calc(50% + 2px), transparent calc(50% + 2px)); }
+
+.som-btn { display: flex; width: 100%; margin: 8px 0; }
+.som h2 { display: flex; align-items: center; } .som h2 a { color: inherit; display: inline-flex; align-items: center; min-height: 48px; flex: 1; } .som h3 { margin: 14px 0 4px; font-size: 18px; }
+.som-l { margin: 0; padding-left: 0; list-style: none; }
+.som-l li { border-top: 1px solid var(--border); }
+.som-a { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; min-height: 48px; padding: 4px 2px; color: var(--text); text-decoration: none; font-size: 17px; }
+.som-a:active { background: var(--surface-2); }
+.som-x li { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; justify-content: space-between; padding: 6px 0; }
+.som-xt { font-weight: 700; } .som-lv { display: flex; flex-wrap: wrap; gap: 6px; }
+.bar .ib + .ib { margin-left: -6px; }
+.prose h2 { scroll-margin-top: 76px; }
