@@ -9,7 +9,7 @@ export default defineConfig({
     VitePWA({
       registerType: 'prompt',
       injectRegister: false,
-      includeAssets: ['icons/*.png', 'icons/*.svg', 'figures/*.svg'],
+      includeAssets: ['icons/*.png', 'icons/*.svg', 'figures/**/*.svg'],
       manifest: {
         id: '/compendium-primaire/',
         name: 'Maths Primaire',

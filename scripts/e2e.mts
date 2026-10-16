@@ -447,6 +447,14 @@ console.log('Chapitre 9 : géométrie');
     t((await fb()).includes('Bravo'), 'solides : comptage accepté');
   } else t(true, 'solides : forme nom (sautée)');
 }
+console.log('Figures par chapitre');
+{
+  await open('#/cours/fractions');
+  const srcs = await p.$$eval('.prose img', (x) => x.map((i) => [(i as HTMLImageElement).getAttribute('src'), (i as HTMLImageElement).naturalWidth > 0]));
+  t(srcs.length > 0 && srcs.every(([s, ok]) => String(s).startsWith('figures/fractions/') && ok), 'fractions : figures du chapitre, chargées', srcs);
+  const svg = await (await fetch(BASE + 'figures/fractions/comparer.svg')).text();
+  t(!svg.includes('dixièmes'), 'fractions §3 : plus de figure décimale');
+}
 console.log('Sommaire');
 {
   await p.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true });

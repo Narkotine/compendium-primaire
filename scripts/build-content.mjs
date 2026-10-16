@@ -25,11 +25,12 @@ for (const c of chapters) {
   // fractions écrites a/b dans le texte → écriture empilée (hors liens et chemins)
   md = md.split('\n').map((l) => (l.startsWith('![') ? l : l.replace(/(?<![\w/.])(\d{1,3})\/(\d{1,3})(?![\w/])/g, '<span class="fr"><span class="fr-n">$1</span><span class="fr-d">$2</span></span>'))).join('\n');
   let html = marked.parse(md, { async: false });
-  html = html.replace(/src="figures\//g, 'src="figures/');
+  html = html.replace(/src="figures\//g, `src="figures/${c.slug}/`);
   html = html.replace(/<hr>/g, '');
   html = html.replace(/<h1>.*?<\/h1>/, '');
   const figDir = path.join(SRC, c.dir, 'figures');
-  for (const f of fs.readdirSync(figDir)) fs.copyFileSync(path.join(figDir, f), path.join(ROOT, 'public', 'figures', f));
+  const dst = path.join(ROOT, 'public', 'figures', c.slug); fs.mkdirSync(dst, { recursive: true });
+  for (const f of fs.readdirSync(figDir)) fs.copyFileSync(path.join(figDir, f), path.join(dst, f));
   out.push({ slug: c.slug, n: c.n, html });
 }
 fs.writeFileSync(path.join(ROOT, 'src/content/cours.ts'), `// Généré par scripts/build-content.mjs — ne pas modifier\nexport const COURS: Record<string, string> = ${JSON.stringify(Object.fromEntries(out.map((o) => [o.slug, o.html])), null, 0)};\n`);
