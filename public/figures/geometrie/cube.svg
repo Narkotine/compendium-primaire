@@ -1,6 +1,0 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 200 160" font-family="sans-serif">
-  <path d="M40,50 L100,20 L160,50 L160,110 L100,140 L40,110 Z" fill="#e8f0fa" stroke="#222" stroke-width="2"/>
-  <path d="M40,50 L100,80 L160,50" fill="none" stroke="#222" stroke-width="2"/>
-  <path d="M100,80 L100,140" fill="none" stroke="#222" stroke-width="2"/>
-  <text x="100" y="155" font-size="13" text-anchor="middle">cube : 6 faces, 12 arêtes, 8 sommets</text>
-</svg>
