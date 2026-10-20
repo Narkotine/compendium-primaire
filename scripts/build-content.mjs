@@ -28,6 +28,16 @@ for (const c of chapters) {
   html = html.replace(/src="figures\//g, `src="figures/${c.slug}/`);
   html = html.replace(/<hr>/g, '');
   html = html.replace(/<h1>.*?<\/h1>/, '');
+  // [[exo id1 id2]] → bouton(s) vers l'exercice, remplis par l'appli (titre, niveaux, étoiles)
+  html = html.replace(/<p>\[\[exo ([a-z0-9 ]+)\]\]<\/p>/g, (_, ids) => `<div class="go-exo" data-exos="${ids.trim()}"></div>`);
+  // Format « écrans » (cours court) : chaque partie h2 devient une carte <section class="ecran">
+  if (md.includes('<!-- format: ecrans -->')) {
+    html = html.replace(/<!-- format: ecrans -->\s*/, '');
+    const src = html.match(/<p><em>Sources[\s\S]*$/)?.[0] ?? '';
+    const body = src ? html.slice(0, -src.length) : html;
+    const parts = body.split(/(?=<h2[ >])/);
+    html = parts.map((x) => (x.startsWith('<h2') ? `<section class="ecran">${x.trim()}</section>` : x)).join('') + src;
+  }
   const figDir = path.join(SRC, c.dir, 'figures');
   const dst = path.join(ROOT, 'public', 'figures', c.slug); fs.mkdirSync(dst, { recursive: true });
   for (const f of fs.readdirSync(figDir)) fs.copyFileSync(path.join(figDir, f), path.join(dst, f));

@@ -56,10 +56,17 @@ function home() {
     <h3>S’entraîner</h3>${exoRows(c.exos)}</section>`).join('')}
     <p class="small muted">★ tu as essayé · ★★ ${GOAL} bonnes réponses de suite du premier coup · ★★★ encore réussi à la révision d’une semaine. Tout est ouvert : commence où tu veux.</p>`);
 }
+/** Bouton « À toi » d'une partie de cours : exercice(s) avec niveaux et étoiles. */
+function goExo(ids: string) {
+  const rows = ids.split(/\s+/).map((id) => EXOS[id]).filter(Boolean).map((e) => `<div class="go-x"><span class="go-xt">${e.title}</span><span class="go-lv">${e.levels.map((l: Level) =>
+    `<a class="btn-lv" href="#/exo/${e.id}/${l}" aria-label="${esc(e.title)}, niveau ${l}">${lvTag(l)} ${starStr(stars(getMastery(e.id, l)))}</a>`).join('')}</span></div>`).join('');
+  return rows ? `<div class="go-exo"><p class="go-t">✏️ À toi !</p>${rows}</div>` : '';
+}
 function cours(slug: string, part?: number) {
   const c = CHAPTERS.find((x) => x.slug === slug);
   if (!c) return home();
-  shell(c.short, `<article class="prose">${COURS[slug] ?? ''}</article><section class="card" id="exos"><h2>S’entraîner</h2>${exoRows(c.exos)}</section>`, '#/sommaire');
+  const html = (COURS[slug] ?? '').replace(/<div class="go-exo" data-exos="([a-z0-9 ]+)"><\/div>/g, (_, ids: string) => goExo(ids));
+  shell(c.short, `<article class="prose${html.includes('class="ecran"') ? ' ecrans' : ''}">${html}</article><section class="card" id="exos"><h2>S’entraîner</h2>${exoRows(c.exos)}</section>`, '#/sommaire');
   app.querySelectorAll('.prose h2').forEach((h, i) => { h.id = `p${i + 1}`; });
   if (part) { const go = () => app.querySelector<HTMLElement>(`#p${part}`)?.scrollIntoView({ block: 'start' }); requestAnimationFrame(go); app.querySelectorAll('.prose img').forEach((im) => im.addEventListener('load', go, { once: true })); setTimeout(go, 350); }
 }

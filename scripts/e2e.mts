@@ -455,6 +455,29 @@ console.log('Figures par chapitre');
   const svg = await (await fetch(BASE + 'figures/fractions/comparer.svg')).text();
   t(!svg.includes('dixièmes'), 'fractions §3 : plus de figure décimale');
 }
+console.log('Cours court ch. 1 (écrans)');
+{
+  await p.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true });
+  await open('#/cours/numeration');
+  const ecr = await p.$$eval('.prose.ecrans section.ecran', (ss) => ss.map((s) => ({ h2: s.querySelectorAll('h2').length, img: [...s.querySelectorAll('img')].map((i) => [(i as HTMLImageElement).getAttribute('src'), (i as HTMLImageElement).naturalWidth > 0, (i as HTMLImageElement).getBoundingClientRect().width]), go: [...s.querySelectorAll('.go-exo a.btn-lv')].map((a) => a.getAttribute('href')), words: (s.textContent ?? '').replace(/[✏️]/g, '').split(/\s+/).filter(Boolean).length, lists: s.querySelectorAll('ul, ol, table').length })));
+  t(ecr.length === 8, 'numération : 8 écrans', ecr.length);
+  t(ecr.every((e) => e.h2 === 1 && e.img.length === 1), 'un titre et une seule figure par écran', ecr.map((e) => [e.h2, e.img.length]));
+  t(ecr.every((e) => e.img.every(([s, ok, w]) => String(s).startsWith('figures/numeration/') && ok && Number(w) > 300)), 'figures chargées, grandes (> 300 px à 390 px)', ecr.map((e) => e.img));
+  t(ecr.every((e) => e.go.length > 0 && e.go.every((h) => /^#\/exo\/[a-z0-9]+\/(CE1|CE2|CM1|CM2|6e)$/.test(String(h)))), 'chaque écran a son bouton « À toi » vers un exercice', ecr.map((e) => e.go.length));
+  t(ecr.every((e) => e.lists === 0), 'pas de liste ni de tableau dans les écrans');
+  const exoIds = new Set(ecr.flatMap((e) => e.go.map((h) => String(h).split('/')[2])));
+  const allIds = ['echanger', 'tableau', 'dizaines', 'ranger', 'droite', 'lire', 'grands', 'suites'];
+  t(allIds.every((id) => exoIds.has(id)), 'tous les exercices du chapitre sont reliés à une partie', [...exoIds]);
+  const lv = await p.$$eval('.prose h2', (hs) => [...new Set(hs.flatMap((h) => [...h.querySelectorAll('.lv')].map((x) => x.textContent)))]);
+  t(['CE1', 'CE2', 'CM1', 'CM2', '6e'].every((l) => lv.includes(l)), 'étiquettes de niveau CE1 → 6e conservées', lv);
+  await p.evaluate(() => (document.querySelectorAll('.ecran')[2].querySelector('.go-exo a.btn-lv') as HTMLElement).click()); await W(300);
+  t(/#\/exo\/dizaines\/CE1$/.test(p.url()) && (await p.$('#check')) !== null, 'bouton « À toi » → exercice ouvert', p.url());
+  await open('#/cours/numeration/6');
+  const top6 = await p.evaluate(() => document.getElementById('p6')!.getBoundingClientRect().top);
+  t(top6 >= 0 && top6 < 200, 'route cours/numeration/6 : partie 6 en haut', top6);
+  await open('#/cours/addition');
+  t((await p.$$('.ecran, .go-exo')).length === 0, 'autres chapitres : format inchangé');
+}
 console.log('Sommaire');
 {
   await p.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true });
