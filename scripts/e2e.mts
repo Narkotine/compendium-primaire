@@ -1,5 +1,6 @@
 #!/usr/bin/env -S npx tsx
 /** Gestes de bout en bout (Chrome headless) : glisser au doigt (CDP touch) et à la souris, toucher-toucher, clavier. Prérequis : build + preview. */
+import { CHAPTERS } from '../src/content/chapters';
 import puppeteer, { type Page } from 'puppeteer-core';
 import { echanger } from '../src/exos/echanger';
 import { tableau } from '../src/exos/tableau';
@@ -475,8 +476,28 @@ console.log('Cours court ch. 1 (écrans)');
   await open('#/cours/numeration/6');
   const top6 = await p.evaluate(() => document.getElementById('p6')!.getBoundingClientRect().top);
   t(top6 >= 0 && top6 < 200, 'route cours/numeration/6 : partie 6 en haut', top6);
-  await open('#/cours/addition');
-  t((await p.$$('.ecran, .go-exo')).length === 0, 'autres chapitres : format inchangé');
+}
+console.log('Cours courts : cartes de chaque chapitre');
+{
+  await p.setViewport({ width: 390, height: 844, isMobile: true, hasTouch: true });
+  for (const c of CHAPTERS) {
+    await open(`#/cours/${c.slug}`);
+    const ecr = await p.$$eval('.prose.ecrans section.ecran', (ss) => ss.map((s) => {
+      const go = [...s.querySelectorAll('.go-exo a.btn-lv')].map((a) => a.getAttribute('href') ?? '');
+      const cl = s.cloneNode(true) as HTMLElement; cl.querySelectorAll('.go-exo, h2, .fr').forEach((x) => x.remove());
+      return { h2: s.querySelectorAll('h2').length, lv: s.querySelectorAll('h2 .lv').length, img: [...s.querySelectorAll('img')].map((i) => ({ src: i.getAttribute('src') ?? '', alt: i.getAttribute('alt') ?? '', ok: i.naturalWidth > 0, w: i.getBoundingClientRect().width })), go, lists: s.querySelectorAll('ul, ol, table').length, words: (cl.textContent ?? '').split(/\s+/).filter((w) => /[\p{L}\d]/u.test(w)).length, ex: s.querySelectorAll('blockquote').length };
+    }));
+    const nh2 = await p.$$eval('.prose h2', (x) => x.length);
+    t(ecr.length >= 4 && ecr.length === nh2, `${c.slug} : ${ecr.length} cartes, une par partie`, [ecr.length, nh2]);
+    t(ecr.every((e) => e.h2 === 1 && e.lv > 0), `${c.slug} : chaque carte a son titre et ses niveaux`, ecr.map((e) => e.lv));
+    t(ecr.every((e) => e.img.length === 1 && e.img.every((i) => i.src.startsWith(`figures/${c.slug}/`) && i.ok && i.w > 300 && i.alt.length > 3)), `${c.slug} : une grande figure chargée par carte (> 300 px, texte alternatif)`, ecr.map((e) => e.img));
+    t(ecr.every((e) => e.lists === 0 && e.words <= 60 && e.ex <= 1), `${c.slug} : pas de liste, ≤ 60 mots, au plus un exemple par carte`, ecr.map((e) => e.words));
+    t(ecr.every((e) => e.go.length > 0 && e.go.every((h) => /^#\/exo\/[a-z0-9]+\/(CE1|CE2|CM1|CM2|6e)$/.test(h))), `${c.slug} : chaque carte a sa case « À toi ! »`, ecr.map((e) => e.go.length));
+    const linked = new Set(ecr.flatMap((e) => e.go.map((h) => h.split('/')[2])));
+    t(c.exos.every((id) => linked.has(id)), `${c.slug} : chaque exercice est relié à une carte`, c.exos.filter((id) => !linked.has(id)));
+    const titles = await Promise.all(ecr.map(async (e) => (await (await fetch(BASE + e.img[0].src)).text()).includes('<title>')));
+    t(titles.every(Boolean), `${c.slug} : figures SVG avec titre (lecteur d’écran)`);
+  }
 }
 console.log('Sommaire');
 {
