@@ -22,6 +22,12 @@ const out = [];
 for (const c of chapters) {
   let md = fs.readFileSync(path.join(SRC, c.dir, 'cours.md'), 'utf8');
   md = md.replace(/<br>$/gm, '<br>').replace(/`(CE1|CE2|CM1|CM2|6e)`/g, '<span class="lv lv-$1">$1</span>');
+  // cours « écrans » : une écriture mathématique (3 × 2/5 = 6/5) ne se coupe pas en fin de ligne
+  if (md.includes('<!-- format: ecrans -->')) {
+    const tok = String.raw`\d+(?:[,/]\d+)?`, op = String.raw`(?:=|\+|−|×|÷|&lt;|&gt;|≠|≈)`;
+    const run = new RegExp(String.raw`(?<![\w/,])${tok}(?: ${op} ${tok})+(?![\w/])`, 'g');
+    md = md.split('\n').map((l) => (/^(!\[|<!--|\[\[|#)/.test(l) ? l : l.replace(run, (m) => `<span class="nw">${m}</span>`))).join('\n');
+  }
   // fractions écrites a/b dans le texte → écriture empilée (hors liens et chemins)
   md = md.split('\n').map((l) => (l.startsWith('![') ? l : l.replace(/(?<![\w/.])(\d{1,3})\/(\d{1,3})(?![\w/])/g, '<span class="fr"><span class="fr-n">$1</span><span class="fr-d">$2</span></span>'))).join('\n');
   let html = marked.parse(md, { async: false });
@@ -40,7 +46,9 @@ for (const c of chapters) {
   }
   const figDir = path.join(SRC, c.dir, 'figures');
   const dst = path.join(ROOT, 'public', 'figures', c.slug); fs.mkdirSync(dst, { recursive: true });
-  for (const f of fs.readdirSync(figDir)) fs.copyFileSync(path.join(figDir, f), path.join(dst, f));
+  const figs = fs.readdirSync(figDir);
+  for (const f of fs.readdirSync(dst)) if (!figs.includes(f)) fs.rmSync(path.join(dst, f)); // figures retirées du cours
+  for (const f of figs) fs.copyFileSync(path.join(figDir, f), path.join(dst, f));
   out.push({ slug: c.slug, n: c.n, html });
 }
 fs.writeFileSync(path.join(ROOT, 'src/content/cours.ts'), `// Généré par scripts/build-content.mjs — ne pas modifier\nexport const COURS: Record<string, string> = ${JSON.stringify(Object.fromEntries(out.map((o) => [o.slug, o.html])), null, 0)};\n`);
