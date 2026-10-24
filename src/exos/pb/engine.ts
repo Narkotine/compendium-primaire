@@ -99,8 +99,36 @@ export function makeProblemExo(id: string, title: string, notion: string, levels
   };
   return exo;
 }
-/** Plages des nombres des problèmes, par niveau. */
-export const RANGE: Record<Level, [number, number]> = { CE1: [10, 600], CE2: [100, 6000], CM1: [1000, 60000], CM2: [1000, 600000], '6e': [10000, 9000000] };
+/** Plages des nombres des problèmes, par niveau et par palier (palier 1, 2, 3). */
+export const RANGES: Record<Level, [number, number][]> = {
+  CE1: [[10, 60], [10, 90], [10, 99]],
+  CE2: [[20, 300], [100, 2000], [100, 4000]],
+  CM1: [[1000, 60000], [1000, 60000], [1000, 60000]],
+  CM2: [[1000, 600000], [1000, 600000], [1000, 600000]],
+  '6e': [[10000, 9000000], [10000, 9000000], [10000, 9000000]],
+};
+/**
+ * Plafond de tous les nombres du calcul (données, résultats intermédiaires, réponse), par palier.
+ * CE1 : calcul faisable de tête ou presque (≤ 100, puis ≤ 200) ; palier 1 sans retenue.
+ */
+export const CAP: Partial<Record<Level, [number, number, number]>> = { CE1: [100, 100, 200], CE2: [600, 5000, 10000] };
+/** Le calcul « a + b − c » (lu de gauche à droite) respecte-t-il les plafonds du niveau ? */
+export function calcOK(lv: Level, p: Palier, model: string): boolean {
+  const cap = CAP[lv]?.[p - 1];
+  if (!cap) return true;
+  const tk = model.split(/ ([+−]) /);
+  const num = (x: string) => Number(x.replace(/\D/g, ''));
+  let acc = num(tk[0]);
+  if (acc > cap) return false;
+  for (let i = 1; i < tk.length; i += 2) {
+    const op = tk[i], b = num(tk[i + 1]);
+    if (b > cap) return false;
+    if (lv === 'CE1' && p === 1 && (op === '+' ? (acc % 10) + (b % 10) >= 10 : acc % 10 < b % 10)) return false;
+    acc = op === '+' ? acc + b : acc - b;
+    if (acc > cap || acc < 0) return false;
+  }
+  return true;
+}
 
 /** Données inutiles : au CE1 seulement au palier 3 ; à partir du CE2 dès le palier 2. */
 export const uOK = (lv: Level, p: Palier) => (lv === 'CE1' ? p >= 3 : p >= 2);
