@@ -14,13 +14,17 @@ import { dizaines } from '../src/exos/dizaines';
 import { ranger } from '../src/exos/ranger';
 import { droite, N_INT } from '../src/exos/droite';
 import { probmul } from '../src/exos/probmul';
+import { probdiv } from '../src/exos/probdiv';
+import { probprop } from '../src/exos/probprop';
+import { probfrac } from '../src/exos/probfrac';
+import { probdec } from '../src/exos/dec/probdec';
 import { convertir, monnaie, horloge } from '../src/exos/mes/base';
 import { duree, probmes } from '../src/exos/mes/suite';
 
 const N = Number(process.argv[2] || 2000);
 let pass = 0, fail = 0;
 const errs: string[] = [];
-const t = (c: boolean, m: string) => { if (c) pass++; else { fail++; if (errs.length < 15) errs.push(m); } };
+const t = (c: boolean, m: string) => { if (c) pass++; else { fail++; if (errs.length < Number(process.env.ERRS ?? 15)) errs.push(m); } };
 const LV: Level[] = ['CE1', 'CE2'], P: Palier[] = [1, 2, 3];
 
 for (const lv of LV) for (const p of P) for (let s = 1; s <= N; s++) {
@@ -231,6 +235,41 @@ for (const lv of LV) for (const p of P) {
     const sp = subpose.generate(lv, p, s); t(!/-\d/.test(subpose.correction(sp)), `subpose corrigé sans « -1 » ${tag}`);
   }
   if (lv === 'CE1') t(conv.size >= 4, `conv CE1 variété ${p} ${[...conv]}`);
+}
+
+// ---- problèmes : la bonne opération n'est pas toujours celle du chapitre (retour Nguhma 24/10)
+{
+  const EX: [typeof probmul, string, [number, number, number]][] = [[probmul, '×', [0.35, 0.45, 0.5]], [probdiv, '÷', [0.3, 0.35, 0.4]], [probprop, '×', [0.35, 0.35, 0.4]], [probfrac, '÷', [0.3, 0.3, 0.35]]];
+  for (const [E, op, share] of EX) for (const lv of E.levels) for (const p of P) {
+    let alt = 0; const opsSeen = new Set<string>(); const tpls = new Set<string>();
+    for (let s = 1; s <= N; s++) {
+      const tag = `${E.id} ${lv}/p${p}/s${s}`;
+      const d = E.generate(lv, p, s); const i = d.inst; const sol = E.solution(d); tpls.add(d.tpl);
+      const isMain = i.model.includes(op);
+      if (!isMain) alt++;
+      opsSeen.add(i.ops.join(''));
+      t(E.check(d, sol).ok, `${tag} solution acceptée ${d.tpl}`);
+      t(Math.abs(evalExpr(sol.nums, sol.ops) - (i.exprValue ?? i.answer)) < 1e-9, `${tag} modèle = réponse ${d.tpl}`);
+      t(i.ops.includes(op) && i.ops.includes('+') && i.ops.includes('−'), `${tag} étiquettes ${op}, + et − proposées`);
+      { const tx = (i.text + ' ' + i.question).replace(/\u202f/g, ''); t(i.nums.every((x) => tx.includes(String(x))), `${tag} nombres dans l’énoncé ${d.tpl}`); }
+      if (i.slots === 2) {
+        // l'autre opération : jamais acceptée, message ciblé (pas le message générique)
+        const wrongOp = isMain ? '+' : op;
+        const v = E.check(d, { nums: sol.nums, ops: [wrongOp], result: null });
+        t(!v.ok && !!v.msg && !/^Ce calcul ne répond pas/.test(v.msg) && !/Le calcul est juste/.test(v.msg), `${tag} ${wrongOp} refusé avec message ciblé ${d.tpl} : ${v.msg}`);
+      }
+      t(/class="small"/.test(E.correction(d)) && E.correction(d).includes(i.model), `${tag} corrigé avec la méthode`);
+      if (E === probmul && lv === 'CE1') t(i.answer <= 100 && i.nums.every((x) => x <= 100), `${tag} CE1 ≤ 100`);
+      if (E === probmul && i.slots === 2) t(i.nums[0] + i.nums[1] !== i.nums[0] * i.nums[1], `${tag} jamais 2 et 2`);
+    }
+    t(opsSeen.size === 1, `${E.id} ${lv}/p${p} mêmes étiquettes pour tous les problèmes ${[...opsSeen]}`);
+    const f = alt / N; t(Math.abs(f - share[p - 1]) < 0.06, `${E.id} ${lv}/p${p} part de non-${op} ${f.toFixed(2)} ≈ ${share[p - 1]}`);
+    t(f >= 0.25 && f <= 0.55, `${E.id} ${lv}/p${p} entre 1/4 et un peu plus de 1/2 de non-${op} (${f.toFixed(2)})`);
+  }
+  // probdec : mêmes étiquettes +, −, × pour tous les problèmes
+  for (const lv of probdec.levels) for (const p of P) for (let s = 1; s <= Math.min(N, 300); s++) {
+    const d = probdec.generate(lv, p, s); t(d.inst.ops.join('') === '+−×', `probdec étiquettes ${lv}/p${p}/s${s}`); t(probdec.check(d, probdec.solution(d)).ok, `probdec solution ${lv}/p${p}/s${s}`);
+  }
 }
 // ---- maîtrise, révisions espacées (localStorage simulé)
 {

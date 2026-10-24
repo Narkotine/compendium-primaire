@@ -14,7 +14,12 @@ const mk = (o: Pick<PbInst, 'text' | 'question' | 'nums' | 'answer' | 'unit' | '
 export const FRACPB: PbTemplate[] = [
   { id: 'unitaire', levels: ['CM1', 'CM2', '6e'], minP: 1, make(r, lv, p) {
     const b = r.pick([2, 3, 4, 5, 10]); const n = b * r.int(3, 30); const [P] = names(r, 1); const u = uOK(lv, p) ? useless(r) : null;
-    return mk({ text: `${P} a ${fmt(n)} billes. ${u?.s ?? ''}${il(P) === 'elle' ? 'Elle' : 'Il'} en donne ${fracWords(1, b)} (${F(1, b)}) à son frère.`, question: `Combien de billes donne-t-${il(P)} ?`, nums: [n, b], answer: n / b, unit: 'billes', model: `${fmt(n)} ÷ ${b}`, hint: `${F(1, b)} de ${fmt(n)} : on partage ${fmt(n)} en ${b} parts égales.`, diag: (_, o) => (o.includes('×') ? `${F(1, b)} de ${fmt(n)}, c’est une part de ${fmt(n)} : c’est plus petit. On divise.` : null) }, u);
+    return mk({ text: `${P} a ${fmt(n)} billes. ${u?.s ?? ''}${il(P) === 'elle' ? 'Elle' : 'Il'} en donne ${fracWords(1, b)} (${F(1, b)}) à son frère.`, question: `Combien de billes donne-t-${il(P)} ?`, nums: [n, b], answer: n / b, unit: 'billes', model: `${fmt(n)} ÷ ${b}`, hint: `${F(1, b)} de ${fmt(n)} : on partage ${fmt(n)} en ${b} parts égales.`, diag: (_, o) => (o.includes('×') ? `${F(1, b)} de ${fmt(n)}, c’est une part de ${fmt(n)} : c’est plus petit. On divise.` : o.includes('−') ? `${il(P) === 'elle' ? 'Elle' : 'Il'} ne donne pas ${b} billes, mais ${fracWords(1, b)} (${F(1, b)}) des billes : on partage ${fmt(n)} en ${b} parts égales.` : o.includes('+') ? `${F(1, b)} de ${fmt(n)}, c’est une part de ${fmt(n)} : c’est plus petit. On partage en ${b}.` : null) }, u);
+  } },
+  { id: 'nombre', alt: true, levels: ['CM1', 'CM2', '6e'], minP: 1, make(r, lv, p) {
+    // ressemble à « un cinquième », mais il donne 5 billes : on enlève
+    const b = r.pick([2, 3, 4, 5, 10]); const n = b * r.int(3, 30); const [P] = names(r, 1); const u = uOK(lv, p) ? useless(r) : null;
+    return mk({ text: `${P} a ${fmt(n)} billes. ${u?.s ?? ''}${il(P) === 'elle' ? 'Elle' : 'Il'} en donne ${b} à son frère.`, question: `Combien de billes lui reste-t-il ?`, nums: [n, b], answer: n - b, unit: 'billes', model: `${fmt(n)} − ${b}`, hint: `« Il en donne ${b} » : ce sont ${b} billes (pas ${F(1, b)}). Il lui en reste ${b} de moins.`, diag: (_, o) => (o.includes('÷') ? `« ${il(P) === 'elle' ? 'Elle' : 'Il'} en donne ${b} » : ce sont ${b} billes, pas ${F(1, b)} des billes. On enlève ${b}.` : o.includes('×') || o.includes('+') ? `${P} donne des billes : il lui en reste moins. On enlève ${b}.` : null) }, u);
   } },
   { id: 'nonunit', levels: ['CM2', '6e'], minP: 2, make(r, lv, p) {
     const b = r.pick([3, 4, 5, 10]); const a = r.int(2, b - 1); const n = b * r.int(3, 25); const u = uOK(lv, p) ? useless(r) : null;

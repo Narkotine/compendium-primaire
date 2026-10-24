@@ -40,9 +40,9 @@ function make(r: Rng, lv: Level, p: Palier): PdInst {
     return {
       text: `${P} a acheté ${F(a)} kg de pommes.${uTxt} ${il(P)[0].toUpperCase() + il(P).slice(1)} a acheté ${F(t)} kg de fruits en tout.`,
       question: `Quelle masse de poires a-t-${il(P)} achetée ?`,
-      nums: [t, a], useless, slots: 2, ops: ['+', '−'], answer: ans, unit: 'kg',
+      nums: [t, a], useless, slots: 2, ops: ['+', '−', '×'], answer: ans, unit: 'kg',
       model: `${F(t)} − ${F(a)}`, hint: `La masse totale moins les pommes.`,
-      diag: (_nums, ops) => (ops[0] === '+' ? `On enlève la masse des pommes au total, on ne les ajoute pas.` : null),
+      diag: (_nums, ops) => (ops[0] === '+' ? `On enlève la masse des pommes au total, on ne les ajoute pas.` : ops[0] === '×' ? `On ne multiplie pas : on cherche ce qui reste quand on enlève les pommes du total.` : null),
     };
   }
   if (kind === 'prix') {
@@ -52,9 +52,9 @@ function make(r: Rng, lv: Level, p: Palier): PdInst {
     return {
       text: `${P} achète un livre à ${F(a)} € et un cahier à ${F(b)} €.${uTxt}`,
       question: `Combien paie-t-${il(P)} en tout ?`,
-      nums: [a, b], useless, slots: 2, ops: ['+', '−'], answer: ans, unit: '€',
+      nums: [a, b], useless, slots: 2, ops: ['+', '−', '×'], answer: ans, unit: '€',
       model: `${F(a)} + ${F(b)}`, hint: `On réunit les deux prix.`,
-      diag: (_nums, ops) => (ops[0] === '−' ? `On paie les deux : on additionne.` : null),
+      diag: (_nums, ops) => (ops[0] === '−' ? `On paie les deux : on additionne.` : ops[0] === '×' ? `Un livre ET un cahier : on additionne les deux prix, on ne multiplie pas.` : null),
     };
   }
   if (kind === 'deplus') {
@@ -65,9 +65,9 @@ function make(r: Rng, lv: Level, p: Palier): PdInst {
     return {
       text: `${P} mesure ${F(a)} m.${uTxt} ${P} mesure ${F(d)} m de plus que ${Q}.`,
       question: `Quelle est la taille de ${Q} ?`,
-      nums: [a, d], useless, slots: 2, ops: ['+', '−'], answer: ans, unit: 'm',
+      nums: [a, d], useless, slots: 2, ops: ['+', '−', '×'], answer: ans, unit: 'm',
       model: `${F(a)} − ${F(d)}`, hint: `${P} est plus grand : on enlève l’écart pour trouver ${Q}.`,
-      diag: (_nums, ops) => (ops[0] === '+' ? `${Q} est plus petit que ${P} : on enlève.` : null),
+      diag: (_nums, ops) => (ops[0] === '+' ? `${Q} est plus petit que ${P} : on enlève.` : ops[0] === '×' ? `« De plus » donne un écart : on enlève, on ne multiplie pas.` : null),
     };
   }
   // mul: entier × décimal
@@ -77,9 +77,9 @@ function make(r: Rng, lv: Level, p: Palier): PdInst {
   return {
     text: `Un dictionnaire coûte ${F(prix)} €.${uTxt} La maîtresse en achète ${k}.`,
     question: `Quel montant doit-elle payer ?`,
-    nums: [prix, fromParts(k, [])], useless, slots: 2, ops: ['+', '×'], answer: ans, unit: '€',
+    nums: [prix, fromParts(k, [])], useless, slots: 2, ops: ['+', '−', '×'], answer: ans, unit: '€',
     model: `${F(prix)} × ${k}`, hint: `${k} dictionnaires au même prix : on multiplie.`,
-    diag: (_nums, ops) => (ops[0] === '+' ? `Ce n’est pas un ajout une fois : c’est ${k} fois le prix.` : null),
+    diag: (_nums, ops) => (ops[0] === '+' ? `Ce n’est pas un ajout une fois : c’est ${k} fois le prix.` : ops[0] === '−' ? `On achète ${k} dictionnaires : on paie ${k} fois le prix.` : null),
   };
 }
 

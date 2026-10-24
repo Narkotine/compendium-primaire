@@ -16,7 +16,7 @@ function useless(r: Rng): { s: string; v: number } {
 const ops = ['+', '−', '×', '÷'];
 const mk = (o: Partial<PbInst> & Pick<PbInst, 'text' | 'question' | 'nums' | 'answer' | 'unit' | 'model' | 'hint'>, u: { v: number } | null): PbInst =>
   ({ slots: o.nums.length, ops, useless: u && !o.nums.includes(u.v) ? [u.v] : [], ...o } as PbInst);
-const notMul = (n: number, k: number) => (_: number[], o: string[]) => (o.includes('×') ? `Le résultat doit être plus petit que ${fmt(n)} : on partage, on ne multiplie pas.` : o.includes('−') ? `Enlever ${k} une seule fois ne suffit pas : on cherche combien de fois ${k} il y a dans ${fmt(n)}.` : null);
+const notMul = (n: number, k: number) => (_: number[], o: string[]) => (o.includes('×') ? `Le résultat doit être plus petit que ${fmt(n)} : on partage, on ne multiplie pas.` : o.includes('−') ? `Enlever ${k} une seule fois ne suffit pas : on cherche combien de fois ${k} il y a dans ${fmt(n)}.` : o.includes('+') ? `On n’ajoute rien : le résultat est plus petit que ${fmt(n)}. On partage en parts égales (ou on fait des groupes de ${k}).` : null);
 
 export const DIVISIFS: PbTemplate[] = [
   { id: 'partage', levels: ['CE2', 'CM1', 'CM2', '6e'], minP: 1, make(r, lv, p) {
@@ -26,6 +26,16 @@ export const DIVISIFS: PbTemplate[] = [
   { id: 'groupes', levels: ['CE2', 'CM1', 'CM2', '6e'], minP: 1, make(r, lv, p) {
     const k = r.int(...K[lv]), q = r.int(...Q[lv]); const n = k * q; const u = uOK(lv, p) ? useless(r) : null;
     return mk({ text: `Il y a ${fmt(n)} élèves pour le tournoi. ${u?.s ?? ''}On fait des équipes de ${k} élèves.`, question: `Combien y aura-t-il d’équipes ?`, nums: [n, k], answer: q, unit: 'équipes', model: `${fmt(n)} ÷ ${k}`, hint: `Combien de groupes de ${k} peut-on faire avec ${fmt(n)} élèves ?`, diag: notMul(n, k) }, u);
+  } },
+  { id: 'chacun', alt: true, levels: ['CE2', 'CM1', 'CM2', '6e'], minP: 1, make(r, lv, p) {
+    // ressemble au partage, mais chacun a déjà sa part : on cherche le total (multiplication)
+    const k = r.int(...K[lv]), q = r.int(...Q[lv]); const u = uOK(lv, p) ? useless(r) : null;
+    return mk({ text: `${k} enfants ont chacun ${fmt(q)} images. ${u?.s ?? ''}Ils mettent toutes leurs images dans une boîte.`, question: `Combien d’images y a-t-il dans la boîte ?`, nums: [k, q], answer: k * q, unit: 'images', model: `${k} × ${fmt(q)}`, hint: `Chaque enfant a déjà ${fmt(q)} images : on ne partage pas, on réunit ${k} fois ${fmt(q)}.`, diag: (_: number[], o: string[]) => (o.includes('÷') ? `Ici, on ne partage pas : chaque enfant a déjà ${fmt(q)} images. On cherche le total : ${k} fois ${fmt(q)}.` : o.includes('+') || o.includes('−') ? `Il y a ${k} enfants qui ont chacun ${fmt(q)} images : c’est ${k} fois ${fmt(q)}.` : null) }, u);
+  } },
+  { id: 'enleve', alt: true, levels: ['CE2', 'CM1', 'CM2', '6e'], minP: 1, make(r, lv, p) {
+    // ressemble aux équipes, mais des élèves partent : on enlève
+    const k = r.int(...K[lv]), q = r.int(...Q[lv]); const n = k * q; const u = uOK(lv, p) ? useless(r) : null;
+    return mk({ text: `Il y a ${fmt(n)} élèves inscrits au tournoi. ${u?.s ?? ''}${k} élèves sont malades et restent chez eux.`, question: `Combien d’élèves jouent au tournoi ?`, nums: [n, k], answer: n - k, unit: 'élèves', model: `${fmt(n)} − ${k}`, hint: `${k} élèves ne viennent pas : on les enlève.`, diag: (_: number[], o: string[]) => (o.includes('÷') ? `On ne fait pas d’équipes ici : ${k} élèves restent chez eux, on les enlève.` : o.includes('×') ? `${k} élèves ne viennent pas : on enlève ${k}, on ne fait pas ${k} fois.` : o.includes('+') ? `Des élèves restent chez eux : il y en a moins, on enlève.` : null) }, u);
   } },
   { id: 'audessus', levels: ['CE2', 'CM1', 'CM2', '6e'], minP: 2, make(r, lv, p) {
     // « 189 photos, 10 par page » : il faut une page de plus pour le reste

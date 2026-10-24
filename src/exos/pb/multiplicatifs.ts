@@ -1,4 +1,9 @@
-/** Problèmes multiplicatifs : paquets, rangées, prix, « fois plus » ; pièges additifs ; deux étapes (prix × quantité − réduction). */
+/**
+ * Problèmes « multiplier ou pas ? » : paquets, rangées, prix, « fois plus », deux étapes (prix × quantité − réduction),
+ * mélangés avec des problèmes ressemblants (alt) dont la réponse est une addition ou une soustraction :
+ * « 3 de plus », « 3 de moins », deux paquets inégaux, chaises rouges et bleues (retour Nguhma 24/10).
+ * Les étiquettes proposent toujours +, − et × : la forme ne trahit pas la réponse.
+ */
 import type { PbTemplate, PbInst } from './engine';
 import { names, il, uOK } from './engine';
 import { fmt, type Level, type Palier } from '../../engine/types';
@@ -17,7 +22,9 @@ function ab1(r: Rng, p: Palier): [number, number] {
   const t = r.pick(p === 1 ? [2, 5, 10] : [2, 3, 4, 5, 10]), o = r.int(2, p === 1 ? 9 : 10);
   return r.next() < 0.5 ? [t, o] : [o, t];
 }
-const ab = (r: Rng, lv: Level, p: Palier): [number, number] => (lv === 'CE1' ? ab1(r, p) : [r.int(...A[lv]), lv === 'CE2' ? r.int(...B2[p - 1]) : r.int(...B[lv])]);
+const ab0 = (r: Rng, lv: Level, p: Palier): [number, number] => (lv === 'CE1' ? ab1(r, p) : [r.int(...A[lv]), lv === 'CE2' ? r.int(...B2[p - 1]) : r.int(...B[lv])]);
+/** jamais 2 et 2 : 2 + 2 = 2 × 2, l’enfant ne pourrait pas se tromper d’opération */
+const ab = (r: Rng, lv: Level, p: Palier): [number, number] => { for (;;) { const x = ab0(r, lv, p); if (x[0] + x[1] !== x[0] * x[1]) return x; } };
 function useless(r: Rng): { s: string; v: number } {
   return r.pick([
     () => { const v = r.int(2, 6); return { s: `On est le ${v} juin. `, v }; },
@@ -25,9 +32,11 @@ function useless(r: Rng): { s: string; v: number } {
     () => { const v = r.int(3, 9); return { s: `Le trajet dure ${v} minutes. `, v }; },
   ])();
 }
-const mk = (text: string, question: string, nums: number[], u: { v: number } | null, answer: number, unit: string, model: string, hint: string, diag: PbInst['diag'], ops = ['+', '×']): PbInst =>
+const mk = (text: string, question: string, nums: number[], u: { v: number } | null, answer: number, unit: string, model: string, hint: string, diag: PbInst['diag'], ops = ['+', '−', '×']): PbInst =>
   ({ text, question, nums, useless: u && !nums.includes(u.v) ? [u.v] : [], slots: nums.length, ops, answer, unit, diag, hint, model });
-const plusMsg = (a: number, b: number, what: string) => (_: number[], ops: string[]) => (ops.includes('+') ? `Ajouter ${fmt(a)} et ${fmt(b)} ne suffit pas : il y a ${fmt(a)} fois ${fmt(b)} ${what}.` : null);
+const plusMsg = (a: number, b: number, what: string) => (_: number[], ops: string[]) => (ops.includes('+') ? `Ajouter ${fmt(a)} et ${fmt(b)} ne suffit pas : il y a ${fmt(a)} fois ${fmt(b)} ${what}.` : ops.includes('−') ? `On n’enlève rien ici : il y a ${fmt(a)} groupes pareils de ${fmt(b)} ${what}, on multiplie.` : null);
+/** deux nombres différents, tirés comme ceux des multiplications (on ne devine pas l’opération à la taille des nombres) */
+const two = (r: Rng, lv: Level, p: Palier): [number, number] | null => { const [a, b] = ab(r, lv, p); return a === b || a + b === a * b ? null : [a, b]; };
 
 export const MULTIPLICATIFS: PbTemplate[] = [
   { id: 'paquets', levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'], minP: 1, make(r, lv, p) {
@@ -43,13 +52,30 @@ export const MULTIPLICATIFS: PbTemplate[] = [
     return mk(`${P} achète ${q} livres. ${u?.s ?? ''}Un livre coûte ${pr} €.`, `Combien ${P} paie-t-${il(P)} ?`, [q, pr], u, q * pr, '€', `${q} × ${pr}`, `${q} livres au même prix : ${q} fois ${pr} €.`, plusMsg(q, pr, '€'));
   } },
   { id: 'foisplus', levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'], minP: 2, make(r, lv, p) {
-    const [P, Q] = names(r, 2); const [k, b] = lv === 'CE1' ? (() => { const k = r.pick([2, 3, 4, 5]); return [k, k === 2 || k === 5 ? r.int(2, 10) : r.pick([2, 5, 10])]; })() : [r.int(2, 9), lv === 'CE2' ? r.int(...B2[p - 1]) : r.int(...B[lv])]; const u = uOK(lv, p) ? useless(r) : null;
+    const [P, Q] = names(r, 2); const [k, b] = lv === 'CE1' ? (() => { const k = r.pick([2, 3, 4, 5]); return [k, k === 2 ? r.int(3, 10) : k === 5 ? r.int(2, 10) : r.pick([2, 5, 10])]; })() : [r.int(2, 9), lv === 'CE2' ? r.int(...B2[p - 1]) : r.int(...B[lv])]; const u = uOK(lv, p) ? useless(r) : null;
     return mk(`${P} a ${fmt(b)} images. ${u?.s ?? ''}${Q} en a ${k} fois plus.`, `Combien d’images ${Q} a-t-${il(Q)} ?`, [k, b], u, k * b, 'images', `${k} × ${fmt(b)}`, `« ${k} fois plus » : ${Q} a ${k} fois le nombre d’images de ${P}.`, (_, ops) => (ops.includes('+') ? `« ${k} fois plus », ce n’est pas « ${k} de plus » : on multiplie.` : null));
   } },
-  { id: 'deplus', levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'], minP: 3, make(r, lv) {
-    // piège inverse : « de plus » dans un chapitre de multiplication → on ajoute
-    const [P, Q] = names(r, 2); const k = r.int(2, 9); const b = r.int(...B[lv]);
-    return mk(`${P} a ${fmt(b)} images. ${Q} en a ${k} de plus.`, `Combien d’images ${Q} a-t-${il(Q)} ?`, [k, b], null, k + b, 'images', `${fmt(b)} + ${k}`, `« ${k} de plus » : ${Q} a les mêmes, et encore ${k}.`, (_, ops) => (ops.includes('×') ? `Attention : « ${k} DE plus », ce n’est pas « ${k} FOIS plus ». On ajoute ${k}.` : null));
+  { id: 'deplus', alt: true, levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'], minP: 1, make(r, lv, p) {
+    // ressemble à « fois plus » : on ajoute
+    const t = two(r, lv, p); if (!t) return null; const k = Math.min(...t), b = Math.max(...t);
+    const [P, Q] = names(r, 2); const u = uOK(lv, p) ? useless(r) : null;
+    return mk(`${P} a ${fmt(b)} images. ${u?.s ?? ''}${Q} en a ${k} de plus.`, `Combien d’images ${Q} a-t-${il(Q)} ?`, [k, b], u, k + b, 'images', `${fmt(b)} + ${k}`, `« ${k} de plus » : ${Q} a les mêmes images que ${P}, et encore ${k}. On ajoute.`, (_, ops) => (ops.includes('×') ? `Attention : « ${k} DE plus », ce n’est pas « ${k} FOIS plus ». On ajoute ${k}, on ne fait pas ${k} fois.` : ops.includes('−') ? `${Q} en a PLUS que ${P} : on ajoute.` : null));
+  } },
+  { id: 'demoins', alt: true, levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'], minP: 2, make(r, lv, p) {
+    const t = two(r, lv, p); if (!t) return null; const k = Math.min(...t), b = Math.max(...t);
+    const [P, Q] = names(r, 2); const u = uOK(lv, p) ? useless(r) : null;
+    return mk(`${P} a ${fmt(b)} cartes. ${u?.s ?? ''}${Q} en a ${k} de moins.`, `Combien de cartes ${Q} a-t-${il(Q)} ?`, [b, k], u, b - k, 'cartes', `${fmt(b)} − ${k}`, `« ${k} de moins » : ${Q} a ${k} cartes de moins que ${P}. On enlève ${k}.`, (_, ops) => (ops.includes('×') ? `« ${k} de moins » : on enlève ${k}, on ne fait pas ${k} fois.` : ops.includes('+') ? `${Q} en a MOINS que ${P} : on enlève.` : null));
+  } },
+  { id: 'inegaux', alt: true, levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'], minP: 1, make(r, lv, p) {
+    // ressemble aux paquets, mais les deux paquets n'ont pas le même nombre de biscuits
+    const t = two(r, lv, p); if (!t) return null; const [a, b] = t;
+    const [P] = names(r, 1); const u = uOK(lv, p) ? useless(r) : null;
+    return mk(`${P} a deux paquets de biscuits. ${u?.s ?? ''}Le premier paquet contient ${fmt(a)} biscuits, le deuxième ${fmt(b)} biscuits.`, `Combien de biscuits ${P} a-t-${il(P)} en tout ?`, [a, b], u, a + b, 'biscuits', `${fmt(a)} + ${fmt(b)}`, `Les deux paquets ne sont pas pareils (${fmt(a)} et ${fmt(b)}) : on les réunit, on ajoute.`, (_, ops) => (ops.includes('×') ? `Ici, les paquets n’ont pas le même nombre de biscuits : on ne peut pas multiplier. On réunit les deux paquets : on ajoute.` : ops.includes('−') ? `On réunit les deux paquets : on ajoute.` : null));
+  } },
+  { id: 'chaises', alt: true, levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'], minP: 1, make(r, lv, p) {
+    // ressemble aux rangées, mais ce sont deux quantités différentes
+    const t = two(r, lv, p); if (!t) return null; const [a, b] = t; const u = uOK(lv, p) ? useless(r) : null;
+    return mk(`Dans la salle de spectacle, il y a ${fmt(a)} chaises rouges. ${u?.s ?? ''}Il y a aussi ${fmt(b)} chaises bleues.`, `Combien y a-t-il de chaises ?`, [a, b], u, a + b, 'chaises', `${fmt(a)} + ${fmt(b)}`, `${fmt(a)} chaises rouges et ${fmt(b)} chaises bleues : ce ne sont pas des rangées pareilles. On réunit, on ajoute.`, (_, ops) => (ops.includes('×') ? `Ce ne sont pas ${fmt(a)} rangées de ${fmt(b)} chaises : il y a ${fmt(a)} chaises rouges et ${fmt(b)} chaises bleues. On ne peut pas multiplier : on ajoute.` : ops.includes('−') ? `On réunit les chaises rouges et les chaises bleues : on ajoute.` : null));
   } },
   { id: 'reduc', levels: ['CE2', 'CM1', 'CM2', '6e'], minP: 3, make(r, lv) {
     const [P] = names(r, 1); const q = r.int(3, 9); const pr = r.int(4, lv === 'CE2' ? 20 : 60); const red = r.int(2, Math.max(3, Math.floor(q * pr / 3)));

@@ -13,17 +13,22 @@ const base = (o: Pick<PbInst, 'text' | 'question' | 'nums' | 'answer' | 'unit' |
 export const PROPPB: PbTemplate[] = [
   { id: 'unitaire', levels: ['CE2', 'CM1', 'CM2', '6e'], minP: 1, make(r, lv, p) {
     const pr = r.int(6, 19), q = r.int(3, 9); const u = uOK(lv, p) ? useless(r) : null;
-    return base({ text: `Des tee-shirts coûtent ${pr} € chacun. ${u?.s ?? ''}`, question: `Quel est le prix de ${q} tee-shirts ?`, nums: [pr, q], answer: pr * q, unit: '€', model: `${q} × ${pr}`, hint: `${q} tee-shirts, c’est ${q} fois le prix d’un tee-shirt.`, diag: (_, o) => (o.includes('+') ? `${q} tee-shirts coûtent ${q} FOIS ${pr} €.` : null) }, u);
+    return base({ text: `Des tee-shirts coûtent ${pr} € chacun. ${u?.s ?? ''}`, question: `Quel est le prix de ${q} tee-shirts ?`, nums: [pr, q], answer: pr * q, unit: '€', model: `${q} × ${pr}`, hint: `${q} tee-shirts pareils, c’est ${q} fois le prix d’un tee-shirt.`, diag: (_, o) => (o.includes('+') ? `${q} tee-shirts coûtent ${q} FOIS ${pr} €.` : o.includes('−') || o.includes('÷') ? `${q} tee-shirts coûtent plus cher qu’un seul : ${q} fois ${pr} €.` : null) }, u);
+  } },
+  { id: 'deuxprix', alt: true, levels: ['CE2', 'CM1', 'CM2', '6e'], minP: 1, make(r, lv, p) {
+    // ressemble au prix unitaire, mais on achète deux objets différents : on ajoute
+    const pr = r.int(6, 19), c = r.int(3, 9); const u = uOK(lv, p) ? useless(r) : null;
+    return base({ text: `Un tee-shirt coûte ${pr} €. ${u?.s ?? ''}Une casquette coûte ${c} €.`, question: `Quel est le prix d’un tee-shirt et d’une casquette ?`, nums: [pr, c], answer: pr + c, unit: '€', model: `${pr} + ${c}`, hint: `On achète UN tee-shirt et UNE casquette : on ajoute les deux prix.`, diag: (_, o) => (o.includes('×') ? `Ce ne sont pas ${c} tee-shirts : on achète un tee-shirt ET une casquette. On ajoute les deux prix.` : o.includes('−') || o.includes('÷') ? `On paie les deux objets : on ajoute.` : null) }, u);
   } },
   { id: 'foisplus', levels: ['CM1', 'CM2', '6e'], minP: 1, make(r, lv, p) {
     const k = r.int(2, lv === 'CM1' ? 5 : 9), x = r.int(2, 6), y = r.int(3, 15); const u = uOK(lv, p) ? useless(r) : null; const [P] = names(r, 1);
     return base({ text: `${x} pains aux raisins coûtent ${y} €. ${u?.s ?? ''}${P} achète ${x * k} pains aux raisins.`, question: `Combien ${P} paie-t-${il(P)} ?`, nums: [x * k, x, y], answer: y * k, unit: '€', model: `${x * k} ÷ ${x} × ${y}`, hint: `${x * k} pains, c’est combien de fois plus que ${x} pains ? Le prix est autant de fois plus grand. (Pas besoin du prix d’un pain !)`, diag: (_, o) => (o.includes("+") || o.includes("−") ? `Ce n’est pas « autant de plus » : ${x * k} pains, c’est ${fmt(k)} fois plus que ${x} pains, donc ${k} fois plus cher.` : null) }, u);
   } },
-  { id: 'additif', levels: ['CM1', 'CM2', '6e'], minP: 2, make(r, lv, p) {
+  { id: 'additif', alt: true, levels: ['CM1', 'CM2', '6e'], minP: 2, make(r, lv, p) {
     const q = r.pick([2, 3, 4]); const uu = r.int(3, 9) * q; const x1 = r.int(3, 7), x2 = r.int(1, 5);
     if ((uu * x1) % q || (uu * x2) % q || x1 === x2) return null;
     const y1 = (uu * x1) / q, y2 = (uu * x2) / q; const u = uOK(lv, p) ? useless(r) : null;
-    return base({ text: `${x1} kg de pommes coûtent ${y1} €. ${x2} kg de pommes coûtent ${y2} €. ${u?.s ?? ''}`, question: `Combien coûtent ${x1 + x2} kg de pommes ?`, nums: [y1, y2], answer: y1 + y2, unit: '€', model: `${y1} + ${y2}`, hint: `${x1 + x2} kg, c’est ${x1} kg + ${x2} kg.`, uselessDiag: (n) => (n === x1 || n === x2 ? `${n} kg ne se paie pas ${n} € ! On cherche le prix : ${x1 + x2} kg = ${x1} kg + ${x2} kg, donc on ajoute les deux prix.` : null) }, u);
+    return base({ text: `${x1} kg de pommes coûtent ${y1} €. ${x2} kg de pommes coûtent ${y2} €. ${u?.s ?? ''}`, question: `Combien coûtent ${x1 + x2} kg de pommes ?`, nums: [y1, y2], answer: y1 + y2, unit: '€', model: `${y1} + ${y2}`, hint: `${x1 + x2} kg, c’est ${x1} kg + ${x2} kg.`, diag: (_, o) => (o.includes('×') || o.includes('÷') ? `On connaît déjà le prix de ${x1} kg et celui de ${x2} kg : ${x1 + x2} kg = ${x1} kg + ${x2} kg, donc on ajoute les deux prix.` : o.includes('−') ? `On achète les deux quantités : on ajoute les prix.` : null), uselessDiag: (n) => (n === x1 || n === x2 ? `${n} kg ne se paie pas ${n} € ! On cherche le prix : ${x1 + x2} kg = ${x1} kg + ${x2} kg, donc on ajoute les deux prix.` : null) }, u);
   } },
   { id: 'manege', levels: ['CM1', 'CM2', '6e'], minP: 3, make(r) {
     // piège non proportionnel : une entrée fixe

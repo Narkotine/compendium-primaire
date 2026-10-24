@@ -33,7 +33,8 @@ export interface PbInst {
   /** calcul attendu, pour le corrigé (ex. « 83 + 18 − 27 ») */
   model: string;
 }
-export interface PbTemplate { id: string; levels: Level[]; minP: Palier; make(r: Rng, lv: Level, p: Palier): PbInst | null }
+/** alt : problème « ressemblant » dont la réponse n’est PAS l’opération du chapitre (« 3 de plus » dans les problèmes de multiplication). */
+export interface PbTemplate { id: string; levels: Level[]; minP: Palier; alt?: boolean; make(r: Rng, lv: Level, p: Palier): PbInst | null }
 export interface PbData { lv: Level; p: Palier; seed: number; tpl: string; inst: PbInst }
 export interface PbAnswer { nums: number[]; ops: string[]; result: number | null }
 
@@ -45,12 +46,17 @@ export const lui = (name: string) => (GIRLS.has(name) ? 'elle' : 'lui');
 export const names = (r: Rng, k: number) => r.shuffle([...NAMES]).slice(0, k);
 const sameMultiset = (a: number[], b: number[]) => a.length === b.length && [...a].sort((x, y) => x - y).join() === [...b].sort((x, y) => x - y).join();
 
-export function makeProblemExo(id: string, title: string, notion: string, levels: Level[], tpls: PbTemplate[]): ExoType<PbData, PbAnswer> & { phase: (d: PbData, a: { nums: number[]; ops: string[] }) => { ok: boolean; msg?: string } } {
+/**
+ * altShare : part des problèmes « ressemblants » (alt) par palier, pour que l’enfant choisisse vraiment l’opération
+ * (retour Nguhma 24/10 : sinon il répond toujours par une multiplication).
+ */
+export function makeProblemExo(id: string, title: string, notion: string, levels: Level[], tpls: PbTemplate[], altShare?: [number, number, number]): ExoType<PbData, PbAnswer> & { phase: (d: PbData, a: { nums: number[]; ops: string[] }) => { ok: boolean; msg?: string } } {
   const gen = (lv: Level, p: Palier, seed: number): PbData => {
     const r = rng(seed);
     const pool = tpls.filter((t) => t.levels.includes(lv) && t.minP <= p);
+    const main = pool.filter((t) => !t.alt), alts = pool.filter((t) => t.alt);
     for (;;) {
-      const t = r.pick(pool);
+      const t = altShare && main.length && alts.length ? r.pick(r.next() < altShare[p - 1] ? alts : main) : r.pick(pool);
       const inst = t.make(r, lv, p);
       if (inst && inst.answer >= 0 && Number.isInteger(inst.answer)) return { lv, p, seed, tpl: t.id, inst };
     }
@@ -81,7 +87,7 @@ export function makeProblemExo(id: string, title: string, notion: string, levels
       return { ok: false, msg: `Ton calcul est bien choisi, mais le résultat n’est pas juste. Refais l’opération (tu peux la poser).` };
     },
     hint: (d) => d.inst.hint,
-    correction: (d) => `<p>Calcul : <b>${d.inst.model}${d.inst.exprValue === undefined ? ` = ${fmt(d.inst.answer)}` : ''}</b></p><p>Réponse : ${fmt(d.inst.answer)} ${d.inst.unit}.</p>${d.inst.useless.length ? `<p class="small">${d.inst.useless.map(fmt).join(', ')} ne servai${d.inst.useless.length > 1 ? 'ent' : 't'} à rien.</p>` : ''}`,
+    correction: (d) => `<p class="small">${d.inst.hint}</p><p>Calcul : <b>${d.inst.model}${d.inst.exprValue === undefined ? ` = ${fmt(d.inst.answer)}` : ''}</b></p><p>Réponse : ${fmt(d.inst.answer)} ${d.inst.unit}.</p>${d.inst.useless.length ? `<p class="small">${d.inst.useless.map(fmt).join(', ')} ne servai${d.inst.useless.length > 1 ? 'ent' : 't'} à rien.</p>` : ''}`,
     mount(el, d) {
       const i = d.inst;
       const all = [...i.nums, ...i.useless.filter((u) => !i.nums.includes(u))]; // un même nombre peut servir deux fois (28 − 28 ÷ 4)

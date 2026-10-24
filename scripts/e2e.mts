@@ -11,6 +11,7 @@ import { grands } from '../src/exos/grands';
 import { suites, term } from '../src/exos/suites';
 import { addpose, subpose } from '../src/exos/pose';
 import { probadd } from '../src/exos/probadd';
+import { probmul } from '../src/exos/probmul';
 import { evalExpr } from '../src/ui/expr';
 import { mulpose, partials } from '../src/exos/mulpose';
 import { multiples } from '../src/exos/multiples';
@@ -244,6 +245,27 @@ console.log('Chapitre 2 : opérations posées et problèmes');
     await open(`#/exo/probadd/CE1/${P}/${seed}`);
     const ns = await p.$$eval('.pb-text, .ex-pool .tok', (xs) => xs.map((x) => x.textContent ?? '').join(' ').replace(/(\d)\u202f(\d)/g, '$1$2').match(/\d+/g)?.map(Number) ?? []);
     t(ns.length >= 2 && ns.every((x) => x <= cap), `probadd CE1 p${P} s${seed} : nombres ≤ ${cap} affichés`, ns.join(','));
+  }
+}
+console.log('Chapitre 3 : multiplier ou pas ? (probmul CE1)');
+{
+  // retour Nguhma 24/10 : des problèmes ressemblants dont la réponse est une addition, et des messages ciblés
+  const fb = () => p.$eval('.fb', (x) => x.textContent || '');
+  const tok = async (label: string) => p.evaluate((l) => [...document.querySelectorAll<HTMLElement>('.ex-pool .tok')].findIndex((x) => x.textContent === l && !x.hidden), label);
+  const fill = async (vals: string[]) => { for (let i = 0; i < vals.length; i++) { await p.click(`.ex-pool .tok:nth-child(${(await tok(vals[i])) + 1})`); await p.click(`.ex-slot[data-s="${i}"]`); await W(40); } };
+  const find = (pred: (tpl: string) => boolean) => { let s = 1; while (!pred(probmul.generate('CE1', 1, s).tpl)) s++; return s; };
+  for (const [tpl, op] of [['inegaux', '+'], ['paquets', '×']] as const) {
+    const s = find((x) => x === tpl); const d = probmul.generate('CE1', 1, s); const sol = probmul.solution(d);
+    await open(`#/exo/probmul/CE1/1/${s}`);
+    const labels = await p.$$eval('.ex-pool .tok', (xs) => xs.map((x) => x.textContent));
+    t(['+', '−', '×'].every((o) => labels.includes(o)), `probmul CE1 ${tpl} : étiquettes +, − et × proposées`, labels.join(' '));
+    t(await p.evaluate(() => (document.body.textContent ?? '').includes('multiplier ou pas')), 'probmul : titre « multiplier ou pas ? »');
+    // mauvaise opération : message ciblé
+    await fill([String(sol.nums[0]), op === '+' ? '×' : '+', String(sol.nums[1])]); await typeNumber(1); await p.click('#check'); await W(60);
+    t(op === '+' ? /pas le même nombre/.test(await fb()) : /fois/.test(await fb()), `probmul CE1 ${tpl} : message ciblé sur l’opération`, await fb());
+    await open(`#/exo/probmul/CE1/1/${s}`);
+    await fill([String(sol.nums[0]), sol.ops[0], String(sol.nums[1])]); await typeNumber(d.inst.answer); await p.click('#check'); await W(60);
+    t((await fb()).includes('Bravo'), `probmul CE1 ${tpl} : ${d.inst.model} accepté`, await fb());
   }
 }
 console.log('Chapitre 3 : multiplication');
