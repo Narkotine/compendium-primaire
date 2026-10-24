@@ -1,6 +1,6 @@
 {
   "name": "compendium-primaire-app",
-  "version": "0.13.3",
+  "version": "0.14.0",
   "private": true,
   "type": "module",
   "description": "PWA hors ligne : maths primaire (CE1–CM2 + 6e), 9 chapitres, exercices générés",
