@@ -205,7 +205,7 @@ export const solides: ExoType<SoData, number | string | number[]> = {
     return { ok: false, msg: `Pour un ${d.solid} : ${SOLIDS[d.solid].faces} faces, ${SOLIDS[d.solid].aretes} arêtes, ${SOLIDS[d.solid].sommets} sommets.` };
   },
   hint: (d) => d.ask === 'nom' ? `Compte les faces et regarde leur forme.` : `Un cube a 6 faces carrées, 12 arêtes, 8 sommets. Compare.`,
-  correction: (d) => d.ask === 'nom' ? `<p>C’est un <b>${d.solid}</b>.</p>` : `<p>Un ${d.solid} a <b>${d.answer}</b> ${d.ask === 'aretes' ? 'arêtes' : d.ask}.</p>`,
+  correction: (d) => d.ask === 'nom' ? `<p>C’est un <b>${d.solid}</b>.</p>` : `<p>${d.solid.startsWith('pyramide') ? 'Une' : 'Un'} ${d.solid} a <b>${d.answer}</b> ${d.ask === 'aretes' ? 'arêtes' : d.ask}.</p>`,
   mount(el, d) {
     if (d.ask === 'nom') {
       el.innerHTML = `<p class="q">Ce solide a ${SOLIDS[d.solid].faces} faces, ${SOLIDS[d.solid].aretes} arêtes, ${SOLIDS[d.solid].sommets} sommets. Lequel est-ce ?</p><div class="w-pk"></div>`;

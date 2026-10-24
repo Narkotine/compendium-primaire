@@ -11,6 +11,15 @@ export const duree: ExoType<DuData, number> = {
   id: 'duree', title: 'Calculer une durée', notion: 'Heure et durées', levels: ['CE1', 'CE2', 'CM1'],
   generate(lv, p, seed) {
     const r = rng(seed);
+    if (lv === 'CE1') {
+      // CE1 : heures en quarts d’heure ; palier 1 dans la même heure, puis jusqu’à 1 h, puis jusqu’à 2 h.
+      for (;;) {
+        const h1 = r.int(7, 16), m1 = r.pick([0, 15, 30, 45]), dur = 15 * r.int(1, [3, 4, 8][p - 1]);
+        const t2 = toMin(h1, m1) + dur;
+        if (p === 1 && m1 + dur >= 60) continue;
+        return { lv, p, h1, m1, h2: Math.floor(t2 / 60), m2: t2 % 60 };
+      }
+    }
     for (;;) {
       const h1 = r.int(7, 16), m1 = p === 1 ? r.pick([0, 15, 30, 45]) : r.int(0, 59);
       const dur = r.int(p === 1 ? 15 : 20, p === 3 ? 150 : 90);
@@ -31,7 +40,7 @@ export const duree: ExoType<DuData, number> = {
     return { ok: false, msg: `De ${d.h1} h ${String(d.m1).padStart(2,'0')} à ${d.h2} h ${String(d.m2).padStart(2,'0')} : compte les minutes.` };
   },
   hint: (d) => `Va d’abord jusqu’à ${d.h1 + (d.m1 ? 1 : 0)} h 00, puis ajoute le reste.`,
-  correction: (d) => `<p>De ${d.h1} h ${String(d.m1).padStart(2,'0')} à ${d.h2} h ${String(d.m2).padStart(2,'0')} : <b>${duree.solution(d)} min</b>${duree.solution(d) >= 60 ? ` (${Math.floor(duree.solution(d)/60)} h ${duree.solution(d)%60} min)` : ''}.</p>`,
+  correction: (d) => `<p>De ${d.h1} h ${String(d.m1).padStart(2,'0')} à ${d.h2} h ${String(d.m2).padStart(2,'0')} : <b>${duree.solution(d)} min</b>${duree.solution(d) >= 60 ? ` (${Math.floor(duree.solution(d)/60)} h${duree.solution(d)%60 ? ` ${duree.solution(d)%60} min` : ''})` : ''}.</p>`,
   mount(el, d) {
     el.innerHTML = `<p class="q">Quelle durée entre <b>${d.h1} h ${String(d.m1).padStart(2,'0')}</b> et <b>${d.h2} h ${String(d.m2).padStart(2,'0')}</b> ?</p><p class="tip">Réponds en minutes.</p><div class="w-kp"></div>`;
     const k = keypad(el.querySelector('.w-kp')!, 'Durée en minutes', 4);
@@ -117,7 +126,7 @@ export const probmes: ExoType<PmData, number> = {
       const t2 = h1 * 60 + m1 + dur;
       return { lv, p, kind: 'duree', text: `${P} est parti·e à ${h1} h ${String(m1).padStart(2,'0')} et arrivé·e à ${Math.floor(t2/60)} h ${String(t2%60).padStart(2,'0')}.${extra}`, q: `Combien de temps ${il(P)} a-t-${il(P)} mis ? (en minutes)`, answer: dur, unit: 'min', hint: 'Calcule la durée entre les deux heures.', model: `durée` };
     }
-    const n = r.int(2, 15);
+    const n = r.int(2, lv === 'CE1' ? 9 : 15); // CE1 : réponse ≤ 900 cm (nombres jusqu’à 1 000)
     return { lv, p, kind: 'conv', text: `${P} a une corde de ${n} m.${extra}`, q: 'Quelle est sa longueur en cm ?', answer: n * 100, unit: 'cm', hint: '1 m = 100 cm.', model: `${n} × 100` };
   },
   solution: (d) => d.answer,

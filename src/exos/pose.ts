@@ -100,10 +100,17 @@ function mkPose(op: '+' | '−'): ExoType<PoseData, number[]> {
           lines.push(`${UNITS[i].many} : ${ds(i).join(' + ')}${c ? ' + 1 (retenue)' : ''} = ${s}${s >= 10 ? ` → j’écris ${s % 10}, je retiens 1` : ''}`);
           c = Math.floor(s / 10);
         } else {
-          let [x, y] = ds(i);
-          x -= c;
+          const [o, y] = ds(i);
+          const x = o - c;
+          if (x < 0) {
+            // 0 dizaine (ou centaine) et une déjà donnée : on casse d’abord une unité du rang suivant (403 − 158)
+            lines.push(`${UNITS[i].many} : il y en a 0 et il faut en donner 1 → échange : 1 ${UNITS[i + 1].one} = 10 ${UNITS[i].many}, il en reste 9 ; 9 − ${y} = ${9 - y}`);
+            c = 1;
+            continue;
+          }
           const ex = x < y;
-          lines.push(`${UNITS[i].many} : ${ex ? `${x} − ${y} impossible → échange : ${x + 10} − ${y} = ${x + 10 - y}` : `${x} − ${y} = ${x - y}`}${c ? ' (une a déjà été échangée)' : ''}`);
+          const pre = c ? `${o} − 1 (une a déjà été échangée) = ${x} ; ` : '';
+          lines.push(`${UNITS[i].many} : ${pre}${ex ? `${x} − ${y} impossible → échange : ${x + 10} − ${y} = ${x + 10 - y}` : `${x} − ${y} = ${x - y}`}`);
           c = ex ? 1 : 0;
         }
       }

@@ -56,9 +56,14 @@ export const convertir: ExoType<CvData, number> = {
   generate(lv, p, seed) {
     const r = rng(seed);
     const kinds: Kind[] = lv === 'CE1' ? ['L', 'M'] : ['L', 'M', 'C'];
-    const pair = r.pick(FACTORS[r.pick(kinds)]);
+    // Unités du programme : CE1 m, cm, km, g, kg ; CE2 en plus mm, dm, t, L, dL, cL (pas de mg ni de mL avant le cycle 3).
+    const allowed = (u: string) => (lv === 'CE1' ? ['m', 'cm', 'km', 'g', 'kg'] : lv === 'CE2' ? ['m', 'cm', 'mm', 'dm', 'km', 'g', 'kg', 't', 'L', 'cL'] : null)?.includes(u) ?? true;
+    const pair = r.pick(FACTORS[r.pick(kinds)].filter((x) => allowed(x.from) && allowed(x.to)));
     const dir: 'up' | 'down' = r.next() < 0.5 ? 'down' : 'up'; // down = vers plus petite unité → ×f
-    const n = r.int(p === 1 ? 1 : 2, p === 3 ? 50 : 20);
+    // Nombres dans le champ du niveau : CE1 ≤ 1 000, CE2 ≤ 10 000.
+    const cap = lv === 'CE1' ? 1000 : lv === 'CE2' ? 10000 : Infinity;
+    const hi = Math.max(1, Math.min(p === 3 ? 50 : 20, Math.floor(cap / pair.f)));
+    const n = r.int(Math.min(p === 1 ? 1 : 2, hi), hi);
     return dir === 'down' ? { lv, p, n, from: pair.from, to: pair.to, f: pair.f, dir } : { lv, p, n: n * pair.f, from: pair.to, to: pair.from, f: pair.f, dir };
   },
   solution: (d) => (d.dir === 'down' ? d.n * d.f : d.n / d.f),
@@ -84,8 +89,10 @@ export const monnaie: ExoType<MoData, string> = {
   id: 'monnaie', title: 'Rendre la monnaie', notion: 'Monnaie', levels: ['CE1', 'CE2'],
   generate(lv, p, seed) {
     const r = rng(seed);
-    const prix = fromParts(r.int(1, p === 1 ? 5 : 20), p === 1 ? [0] : [r.int(0, 9), r.pick([0, 5])]);
-    const payeN = Math.ceil((prix.n / 10 ** prix.s) + r.int(1, 5));
+    // CE1 : euros entiers (complément à 5, 10, 20 €) ; les centimes à virgule arrivent au CE2.
+    const prix = lv === 'CE1' ? fromParts(r.int(1, p === 1 ? 5 : p === 2 ? 9 : 19), [0]) : fromParts(r.int(1, p === 1 ? 5 : 20), p === 1 ? [0] : [r.int(0, 9), r.pick([0, 5])]);
+    const eur = prix.n / 10 ** prix.s;
+    const payeN = lv === 'CE1' ? (p === 1 ? r.pick([5, 10].filter((b) => b > eur)) : p === 2 ? 10 : 20) : Math.ceil(eur + r.int(1, 5));
     const paye = fromParts(payeN, []);
     return { lv, p, prix, paye };
   },
@@ -120,7 +127,8 @@ export const horloge: ExoType<HoData, number[] | string> = {
   id: 'horloge', title: 'Lire et régler l’horloge', notion: 'Heure et durées', levels: ['CE1', 'CE2', 'CM1'],
   generate(lv, p, seed) {
     const r = rng(seed);
-    const h = r.int(1, 12), m = p === 1 ? r.pick([0, 15, 30, 45]) : r.int(0, 59);
+    // CE1 : heures entières, demi-heures et quarts d’heure seulement (programme).
+    const h = r.int(1, 12), m = lv === 'CE1' ? r.pick(p === 1 ? [0, 30] : [0, 15, 30, 45]) : p === 1 ? r.pick([0, 15, 30, 45]) : r.int(0, 59);
     return { lv, p, h, m, mode: p === 3 ? 'régler' : 'lire' };
   },
   solution: (d) => (d.mode === 'lire' ? `${d.h}h${String(d.m).padStart(2, '0')}` : [d.h, d.m]),

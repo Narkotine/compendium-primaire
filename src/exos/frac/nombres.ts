@@ -28,15 +28,15 @@ function fdCheckPos(d: FdData, x: number) {
   if (x === d.k) return { ok: true };
   if (Math.abs(x - d.k) === 1) return { ok: false, msg: `Juste à côté. Compte les espaces (les intervalles) depuis 0, pas les traits.` };
   if (x === d.k % d.b) return { ok: false, msg: `${F(d.k, d.b)}, c’est plus que 1 : ${d.b} ${fracWords(2, d.b).split(" ")[1]} font déjà 1. Continue après 1.` };
-  return { ok: false, msg: `Entre 0 et 1, il y a ${d.b} intervalles : chacun vaut ${F(1, d.b)}. Avance de ${d.k} intervalles depuis 0.` };
+  return { ok: false, msg: `Entre 0 et 1, il y a ${d.b} intervalles : chacun vaut ${F(1, d.b)}. Avance de ${d.k} intervalle${d.k > 1 ? "s" : ""} depuis 0.` };
 }
 export const fracdroite: ExoType<FdData, number> = {
   id: 'fracdroite', title: 'Placer une fraction sur la droite', notion: 'Fractions sur la demi-droite', levels: ['CE2', 'CM1', 'CM2', '6e'],
   generate: (lv, p, seed) => genFd(lv, p, seed, 'placer'),
   solution: (d) => d.k,
   check: (d, x) => fdCheckPos(d, x),
-  hint: (d) => `L’unité (de 0 à 1) est partagée en ${d.b} intervalles égaux. ${F(d.k, d.b)} : avance de ${d.k} intervalles depuis 0.`,
-  correction: (d) => `<p>${F(d.k, d.b)}${mixed(d.k, d.b)} : <b>${d.k} intervalles</b> de ${F(1, d.b)} depuis 0.</p>`,
+  hint: (d) => `L’unité (de 0 à 1) est partagée en ${d.b} intervalles égaux. ${F(d.k, d.b)} : avance de ${d.k} intervalle${d.k > 1 ? "s" : ""} depuis 0.`,
+  correction: (d) => `<p>${F(d.k, d.b)}${mixed(d.k, d.b)} : <b>${d.k} intervalle${d.k > 1 ? "s" : ""}</b> de ${F(1, d.b)} depuis 0.</p>`,
   mount(el, d) {
     el.innerHTML = `<p class="q">Place <span class="eq">${F(d.k, d.b)}</span> sur la demi-droite.</p><div class="w-nl"></div>`;
     const nl = numberLine(el.querySelector('.w-nl')!, { ticks: d.U * d.b, labels: fdLabels(d) });

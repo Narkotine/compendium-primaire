@@ -13,6 +13,9 @@ import { evalExpr } from '../src/ui/expr';
 import { dizaines } from '../src/exos/dizaines';
 import { ranger } from '../src/exos/ranger';
 import { droite, N_INT } from '../src/exos/droite';
+import { probmul } from '../src/exos/probmul';
+import { convertir, monnaie, horloge } from '../src/exos/mes/base';
+import { duree, probmes } from '../src/exos/mes/suite';
 
 const N = Number(process.argv[2] || 2000);
 let pass = 0, fail = 0;
@@ -176,6 +179,58 @@ for (const lv of LV4) for (const p of P) for (let s = 1; s <= N; s++) {
     t(!v.ok && !!v.msg, `pb opération contraire refusée ${tag} ${pb.tpl}`);
   }
   if (pb.tpl === 'tout' || pb.tpl === 'deplus') { const sw = { nums: [...sol.nums].reverse(), ops: sol.ops, result: pb.inst.answer }; t(probadd.check(pb, sw).ok, `pb addition commutative acceptée ${tag}`); }
+}
+
+// ---- bornes de calcul par niveau (retour Nguhma 24/10 : CE1 faisable de tête ou presque)
+const CAPS: Record<string, number[]> = { CE1: [100, 100, 200], CE2: [600, 5000, 10000] };
+const num = (x: string) => Number(x.replace(/\D/g, ''));
+for (const lv of LV) for (const p of P) {
+  let conv = new Set<string>();
+  for (let s = 1; s <= N; s++) {
+    const tag = `${lv}/p${p}/s${s}`, cap = CAPS[lv][p - 1];
+    // probadd : données, résultats intermédiaires et réponse sous le plafond ; CE1 palier 1 sans retenue
+    const pb = probadd.generate(lv, p, s);
+    const tk = pb.inst.model.split(/ ([+−]) /);
+    let acc = num(tk[0]); let okc = acc <= cap, carry = false;
+    for (let i = 1; i < tk.length; i += 2) {
+      const b = num(tk[i + 1]);
+      if (tk[i] === '+') carry ||= (acc % 10) + (b % 10) >= 10; else carry ||= acc % 10 < b % 10;
+      acc = tk[i] === '+' ? acc + b : acc - b; okc &&= b <= cap && acc <= cap && acc >= 0;
+    }
+    t(okc && pb.inst.answer <= cap, `pb plafond ${cap} ${tag} ${pb.inst.model}`);
+    if (lv === 'CE1' && p === 1) t(!carry, `pb CE1 p1 sans retenue ${tag} ${pb.inst.model}`);
+    if (lv === 'CE1' && p < 3) t(pb.inst.nums.every((x) => x <= 100), `pb CE1 p${p} nombres ≤ 100 ${tag}`);
+    // probmul CE1 : tables de 2, 5, 10 au palier 1 ; produit ≤ 100 puis ≤ 150
+    const pm = probmul.generate(lv, p, s);
+    if (lv === 'CE1') {
+      t(pm.inst.answer <= [90, 100, 150][p - 1], `pmul CE1 produit ${tag} ${pm.inst.model}`);
+      const f = pm.inst.model.match(/^(\d+) × (\d+)$/);
+      if (f && p === 1) t([2, 5, 10].includes(+f[1]) || [2, 5, 10].includes(+f[2]), `pmul CE1 p1 table 2/5/10 ${tag} ${pm.inst.model}`);
+    } else t(pm.inst.answer <= 10000, `pmul CE2 ≤ 10 000 ${tag}`);
+    // mental CE1 : 2 chiffres aux paliers 1–2
+    const mm = mental.generate(lv, p, s); const mr = mental.solution(mm);
+    if (lv === 'CE1') t(Math.max(mm.a, mr) <= (p < 3 ? 99 : 1000), `mental CE1 p${p} ${tag} ${mm.a} ${mm.op} ${mm.b}`);
+    else t(Math.max(mm.a, mr) <= (p === 1 ? 999 : 10000), `mental CE2 p${p} ${tag}`);
+    if (mm.kind === 'moinsU') t(mm.a % 10 > 0, `mental moinsU pas « − 0 » ${tag}`);
+    // convertir : unités du programme et nombres dans le champ du niveau
+    const cv = convertir.generate(lv, p, s); conv.add(cv.from + '>' + cv.to);
+    const units = lv === 'CE1' ? ['m', 'cm', 'km', 'g', 'kg'] : ['m', 'cm', 'mm', 'dm', 'km', 'g', 'kg', 't', 'L', 'cL'];
+    t(units.includes(cv.from) && units.includes(cv.to), `conv unités ${lv} ${tag} ${cv.from}>${cv.to}`);
+    t(Math.max(cv.n, convertir.solution(cv)) <= (lv === 'CE1' ? 1000 : 10000), `conv champ ${tag}`);
+    // monnaie CE1 : euros entiers, billet de 5, 10 ou 20 €
+    const mo = monnaie.generate(lv, p, s);
+    if (lv === 'CE1') t(mo.prix.n % 10 ** mo.prix.s === 0 && !/,\d*[1-9]/.test(monnaie.solution(mo)), `monnaie CE1 entiers ${tag}`);
+    if (lv === 'CE1') t([5, 10, 20].includes(mo.paye.n / 10 ** mo.paye.s), `monnaie CE1 billet ${tag}`);
+    // heures et durées CE1 : quarts d'heure
+    if (lv === 'CE1') {
+      const ho = horloge.generate(lv, p, s); t(ho.m % 15 === 0, `horloge CE1 quarts ${tag}`);
+      const du = duree.generate(lv, p, s); t(du.m1 % 15 === 0 && du.m2 % 15 === 0 && duree.solution(du) <= [45, 60, 120][p - 1], `durée CE1 quarts ${tag}`);
+      const ms = probmes.generate(lv, p, s); t(ms.answer <= 1000, `probmes CE1 ≤ 1 000 ${tag}`);
+    }
+    // corrigé de la soustraction posée : jamais de nombre négatif (403 − 158)
+    const sp = subpose.generate(lv, p, s); t(!/-\d/.test(subpose.correction(sp)), `subpose corrigé sans « -1 » ${tag}`);
+  }
+  if (lv === 'CE1') t(conv.size >= 4, `conv CE1 variété ${p} ${[...conv]}`);
 }
 // ---- maîtrise, révisions espacées (localStorage simulé)
 {

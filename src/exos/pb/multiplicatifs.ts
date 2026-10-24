@@ -1,12 +1,23 @@
 /** Problèmes multiplicatifs : paquets, rangées, prix, « fois plus » ; pièges additifs ; deux étapes (prix × quantité − réduction). */
 import type { PbTemplate, PbInst } from './engine';
 import { names, il, uOK } from './engine';
-import { fmt, type Level } from '../../engine/types';
+import { fmt, type Level, type Palier } from '../../engine/types';
 import type { Rng } from '../../engine/rng';
 
 const A: Record<Level, [number, number]> = { CE1: [2, 9], CE2: [3, 9], CM1: [6, 40], CM2: [12, 99], '6e': [50, 999] };
 const B: Record<Level, [number, number]> = { CE1: [2, 10], CE2: [12, 99], CM1: [15, 250], CM2: [25, 999], '6e': [100, 9999] };
-const ab = (r: Rng, lv: Level) => [r.int(...A[lv]), lv === 'CE1' && r.next() < 0.3 ? 10 * r.int(2, 5) : r.int(...B[lv])];
+/** CE2 : le multiplicande grandit avec le palier (12–30, 12–60, 12–99). */
+const B2: [number, number][] = [[12, 30], [12, 60], [12, 99]];
+/**
+ * CE1 : produits des tables travaillées (palier 1 : tables de 2, 5, 10 ; palier 2 : aussi 3 et 4) ;
+ * palier 3 : en plus quelques dizaines (3 × 20), produit ≤ 150.
+ */
+function ab1(r: Rng, p: Palier): [number, number] {
+  if (p === 3 && r.next() < 0.3) { const a = r.int(2, 5), b = 10 * r.pick(a <= 3 ? [2, 3, 4, 5] : [2, 3]); return [a, b]; }
+  const t = r.pick(p === 1 ? [2, 5, 10] : [2, 3, 4, 5, 10]), o = r.int(2, p === 1 ? 9 : 10);
+  return r.next() < 0.5 ? [t, o] : [o, t];
+}
+const ab = (r: Rng, lv: Level, p: Palier): [number, number] => (lv === 'CE1' ? ab1(r, p) : [r.int(...A[lv]), lv === 'CE2' ? r.int(...B2[p - 1]) : r.int(...B[lv])]);
 function useless(r: Rng): { s: string; v: number } {
   return r.pick([
     () => { const v = r.int(2, 6); return { s: `On est le ${v} juin. `, v }; },
@@ -20,11 +31,11 @@ const plusMsg = (a: number, b: number, what: string) => (_: number[], ops: strin
 
 export const MULTIPLICATIFS: PbTemplate[] = [
   { id: 'paquets', levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'], minP: 1, make(r, lv, p) {
-    const [P] = names(r, 1); const [a, b] = ab(r, lv); const u = uOK(lv, p) ? useless(r) : null;
+    const [P] = names(r, 1); const [a, b] = ab(r, lv, p); const u = uOK(lv, p) ? useless(r) : null;
     return mk(`${P} a ${fmt(a)} paquets de biscuits. ${u?.s ?? ''}Chaque paquet contient ${fmt(b)} biscuits.`, `Combien de biscuits ${P} a-t-${il(P)} ?`, [a, b], u, a * b, 'biscuits', `${fmt(a)} × ${fmt(b)}`, `Il y a ${fmt(a)} paquets, tous pareils : c’est ${fmt(a)} fois ${fmt(b)}.`, plusMsg(a, b, 'biscuits'));
   } },
   { id: 'rangees', levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'], minP: 1, make(r, lv, p) {
-    const [a, b] = ab(r, lv); const u = uOK(lv, p) ? useless(r) : null;
+    const [a, b] = ab(r, lv, p); const u = uOK(lv, p) ? useless(r) : null;
     return mk(`Dans la salle de spectacle, il y a ${fmt(a)} rangées. ${u?.s ?? ''}Chaque rangée a ${fmt(b)} chaises.`, `Combien y a-t-il de chaises ?`, [a, b], u, a * b, 'chaises', `${fmt(a)} × ${fmt(b)}`, `Imagine le rectangle : ${fmt(a)} rangées de ${fmt(b)}.`, plusMsg(a, b, 'chaises'));
   } },
   { id: 'prix', levels: ['CE2', 'CM1', 'CM2', '6e'], minP: 2, make(r, lv, p) {
@@ -32,7 +43,7 @@ export const MULTIPLICATIFS: PbTemplate[] = [
     return mk(`${P} achète ${q} livres. ${u?.s ?? ''}Un livre coûte ${pr} €.`, `Combien ${P} paie-t-${il(P)} ?`, [q, pr], u, q * pr, '€', `${q} × ${pr}`, `${q} livres au même prix : ${q} fois ${pr} €.`, plusMsg(q, pr, '€'));
   } },
   { id: 'foisplus', levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'], minP: 2, make(r, lv, p) {
-    const [P, Q] = names(r, 2); const k = r.int(2, lv === 'CE1' ? 5 : 9); const b = r.int(...B[lv]); const u = uOK(lv, p) ? useless(r) : null;
+    const [P, Q] = names(r, 2); const [k, b] = lv === 'CE1' ? (() => { const k = r.pick([2, 3, 4, 5]); return [k, k === 2 || k === 5 ? r.int(2, 10) : r.pick([2, 5, 10])]; })() : [r.int(2, 9), lv === 'CE2' ? r.int(...B2[p - 1]) : r.int(...B[lv])]; const u = uOK(lv, p) ? useless(r) : null;
     return mk(`${P} a ${fmt(b)} images. ${u?.s ?? ''}${Q} en a ${k} fois plus.`, `Combien d’images ${Q} a-t-${il(Q)} ?`, [k, b], u, k * b, 'images', `${k} × ${fmt(b)}`, `« ${k} fois plus » : ${Q} a ${k} fois le nombre d’images de ${P}.`, (_, ops) => (ops.includes('+') ? `« ${k} fois plus », ce n’est pas « ${k} de plus » : on multiplie.` : null));
   } },
   { id: 'deplus', levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'], minP: 3, make(r, lv) {
