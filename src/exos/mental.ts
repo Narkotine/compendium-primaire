@@ -25,9 +25,9 @@ export const mental: ExoType<MenData, number> = {
   levels: ['CE1', 'CE2', 'CM1', 'CM2', '6e'],
   generate(lv, p, seed) {
     const r = rng(seed);
-    // CE1 : nombres à 2 chiffres aux paliers 1–2 (passer par la dizaine, ± 9) ; 3 chiffres au palier 3 (746 + 80, programme).
+    // CE1 : tout ≤ 100 (passer par la dizaine, ± 9, ± dizaines : 46 + 30, 72 − 9).
     // CE2 : nombres jusqu’à 999 au palier 1, puis jusqu’à 9 999.
-    const big = lv === 'CE1' ? (p < 3 ? 99 : 999) : lv === 'CE2' ? (p === 1 ? 999 : 9999) : { CM1: 99999, CM2: 99999, '6e': 999999 }[lv];
+    const big = lv === 'CE1' ? 99 : lv === 'CE2' ? (p === 1 ? 999 : 9999) : { CM1: 99999, CM2: 99999, '6e': 999999 }[lv];
     for (;;) {
       const kind = r.pick(KINDS[lv][p - 1]);
       let a = 0, b = 0, op: '+' | '−' = '+';
@@ -35,8 +35,10 @@ export const mental: ExoType<MenData, number> = {
       if (kind === 'moinsU') { op = '−'; a = r.int(21, Math.min(big, 999)); b = r.int(2, 9); if (a % 10 >= b || a % 10 === 0) continue; }
       if (kind === 'plus9') { a = r.int(23, big - 40); b = r.pick(lv === 'CE1' ? [9] : [9, 19, 29]); if (a % 10 <= 1) continue; }
       if (kind === 'moins9') { op = '−'; a = r.int(40, big); b = r.pick(lv === 'CE1' ? [9] : [9, 19]); if (a % 10 >= 9) continue; }
-      if (kind === 'plusD') { a = r.int(110, big - 100); b = r.int(2, 9) * 10; if (Math.floor(a / 10) % 10 + b / 10 < 10) continue; }
-      if (kind === 'moinsD') { op = '−'; a = r.int(110, big); b = r.int(2, 9) * 10; if (Math.floor(a / 10) % 10 >= b / 10) continue; }
+      if (kind === 'plusD' && lv === 'CE1') { a = r.int(12, 79); b = r.int(1, Math.floor((99 - a) / 10)) * 10; if (b < 10 || a % 10 === 0) continue; }
+      else if (kind === 'moinsD' && lv === 'CE1') { op = '−'; a = r.int(31, 99); b = r.int(1, Math.floor(a / 10) - 1) * 10; if (b < 10 || a % 10 === 0) continue; }
+      else if (kind === 'plusD') { a = r.int(110, big - 100); b = r.int(2, 9) * 10; if (Math.floor(a / 10) % 10 + b / 10 < 10) continue; }
+      else if (kind === 'moinsD') { op = '−'; a = r.int(110, big); b = r.int(2, 9) * 10; if (Math.floor(a / 10) % 10 >= b / 10) continue; }
       if (kind === 'plusC') { a = r.int(1100, Math.max(1200, big - 1000)); b = r.int(2, 9) * 100; if (Math.floor(a / 100) % 10 + b / 100 < 10) continue; }
       const d: MenData = { lv, p, a, b, op, kind };
       if (res(d) < 0 || res(d) > big) continue;

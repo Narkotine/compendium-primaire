@@ -239,8 +239,8 @@ console.log('Chapitre 2 : opérations posées et problèmes');
   t((await fb()).includes('Bravo'), 'probadd : bon calcul et bon résultat', await fb());
 }
 {
-  // retour Nguhma 24/10 : au CE1, problèmes avec des nombres ≤ 100 (palier 1, sans retenue) et ≤ 200 (palier 3)
-  for (const [P, cap] of [[1, 100], [2, 100], [3, 200]] as const) for (const seed of [1, 2, 3, 4, 5]) {
+  // retour Nguhma 24/10 : au CE1, problèmes avec des nombres ≤ 100 à tous les paliers (palier 1 sans retenue)
+  for (const [P, cap] of [[1, 100], [2, 100], [3, 100]] as const) for (const seed of [1, 2, 3, 4, 5]) {
     await open(`#/exo/probadd/CE1/${P}/${seed}`);
     const ns = await p.$$eval('.pb-text, .ex-pool .tok', (xs) => xs.map((x) => x.textContent ?? '').join(' ').replace(/(\d)\u202f(\d)/g, '$1$2').match(/\d+/g)?.map(Number) ?? []);
     t(ns.length >= 2 && ns.every((x) => x <= cap), `probadd CE1 p${P} s${seed} : nombres ≤ ${cap} affichés`, ns.join(','));

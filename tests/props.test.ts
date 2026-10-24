@@ -182,7 +182,7 @@ for (const lv of LV4) for (const p of P) for (let s = 1; s <= N; s++) {
 }
 
 // ---- bornes de calcul par niveau (retour Nguhma 24/10 : CE1 faisable de tête ou presque)
-const CAPS: Record<string, number[]> = { CE1: [100, 100, 200], CE2: [600, 5000, 10000] };
+const CAPS: Record<string, number[]> = { CE1: [100, 100, 100], CE2: [600, 5000, 10000] };
 const num = (x: string) => Number(x.replace(/\D/g, ''));
 for (const lv of LV) for (const p of P) {
   let conv = new Set<string>();
@@ -199,17 +199,17 @@ for (const lv of LV) for (const p of P) {
     }
     t(okc && pb.inst.answer <= cap, `pb plafond ${cap} ${tag} ${pb.inst.model}`);
     if (lv === 'CE1' && p === 1) t(!carry, `pb CE1 p1 sans retenue ${tag} ${pb.inst.model}`);
-    if (lv === 'CE1' && p < 3) t(pb.inst.nums.every((x) => x <= 100), `pb CE1 p${p} nombres ≤ 100 ${tag}`);
+    if (lv === 'CE1') t(pb.inst.nums.every((x) => x <= 100) && pb.inst.useless.every((x) => x <= 100), `pb CE1 p${p} nombres ≤ 100 ${tag}`);
     // probmul CE1 : tables de 2, 5, 10 au palier 1 ; produit ≤ 100 puis ≤ 150
     const pm = probmul.generate(lv, p, s);
     if (lv === 'CE1') {
-      t(pm.inst.answer <= [90, 100, 150][p - 1], `pmul CE1 produit ${tag} ${pm.inst.model}`);
+      t(pm.inst.answer <= [90, 100, 100][p - 1] && pm.inst.nums.every((x) => x <= 100), `pmul CE1 produit ${tag} ${pm.inst.model}`);
       const f = pm.inst.model.match(/^(\d+) × (\d+)$/);
       if (f && p === 1) t([2, 5, 10].includes(+f[1]) || [2, 5, 10].includes(+f[2]), `pmul CE1 p1 table 2/5/10 ${tag} ${pm.inst.model}`);
     } else t(pm.inst.answer <= 10000, `pmul CE2 ≤ 10 000 ${tag}`);
     // mental CE1 : 2 chiffres aux paliers 1–2
     const mm = mental.generate(lv, p, s); const mr = mental.solution(mm);
-    if (lv === 'CE1') t(Math.max(mm.a, mr) <= (p < 3 ? 99 : 1000), `mental CE1 p${p} ${tag} ${mm.a} ${mm.op} ${mm.b}`);
+    if (lv === 'CE1') t(Math.max(mm.a, mm.b, mr) <= 100, `mental CE1 p${p} ≤ 100 ${tag} ${mm.a} ${mm.op} ${mm.b}`);
     else t(Math.max(mm.a, mr) <= (p === 1 ? 999 : 10000), `mental CE2 p${p} ${tag}`);
     if (mm.kind === 'moinsU') t(mm.a % 10 > 0, `mental moinsU pas « − 0 » ${tag}`);
     // convertir : unités du programme et nombres dans le champ du niveau
@@ -224,7 +224,7 @@ for (const lv of LV) for (const p of P) {
     // heures et durées CE1 : quarts d'heure
     if (lv === 'CE1') {
       const ho = horloge.generate(lv, p, s); t(ho.m % 15 === 0, `horloge CE1 quarts ${tag}`);
-      const du = duree.generate(lv, p, s); t(du.m1 % 15 === 0 && du.m2 % 15 === 0 && duree.solution(du) <= [45, 60, 120][p - 1], `durée CE1 quarts ${tag}`);
+      const du = duree.generate(lv, p, s); t(du.m1 % 15 === 0 && du.m2 % 15 === 0 && duree.solution(du) <= [45, 60, 90][p - 1], `durée CE1 quarts ${tag}`);
       const ms = probmes.generate(lv, p, s); t(ms.answer <= 1000, `probmes CE1 ≤ 1 000 ${tag}`);
     }
     // corrigé de la soustraction posée : jamais de nombre négatif (403 − 158)

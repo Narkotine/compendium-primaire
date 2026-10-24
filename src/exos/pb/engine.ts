@@ -101,7 +101,7 @@ export function makeProblemExo(id: string, title: string, notion: string, levels
 }
 /** Plages des nombres des problèmes, par niveau et par palier (palier 1, 2, 3). */
 export const RANGES: Record<Level, [number, number][]> = {
-  CE1: [[10, 60], [10, 90], [10, 99]],
+  CE1: [[10, 60], [10, 90], [10, 90]],
   CE2: [[20, 300], [100, 2000], [100, 4000]],
   CM1: [[1000, 60000], [1000, 60000], [1000, 60000]],
   CM2: [[1000, 600000], [1000, 600000], [1000, 600000]],
@@ -109,9 +109,9 @@ export const RANGES: Record<Level, [number, number][]> = {
 };
 /**
  * Plafond de tous les nombres du calcul (données, résultats intermédiaires, réponse), par palier.
- * CE1 : calcul faisable de tête ou presque (≤ 100, puis ≤ 200) ; palier 1 sans retenue.
+ * CE1 : calcul faisable de tête ou presque : tout ≤ 100 à tous les paliers ; palier 1 sans retenue.
  */
-export const CAP: Partial<Record<Level, [number, number, number]>> = { CE1: [100, 100, 200], CE2: [600, 5000, 10000] };
+export const CAP: Partial<Record<Level, [number, number, number]>> = { CE1: [100, 100, 100], CE2: [600, 5000, 10000] };
 /** Le calcul « a + b − c » (lu de gauche à droite) respecte-t-il les plafonds du niveau ? */
 export function calcOK(lv: Level, p: Palier, model: string): boolean {
   const cap = CAP[lv]?.[p - 1];

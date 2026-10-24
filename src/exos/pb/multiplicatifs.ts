@@ -10,10 +10,10 @@ const B: Record<Level, [number, number]> = { CE1: [2, 10], CE2: [12, 99], CM1: [
 const B2: [number, number][] = [[12, 30], [12, 60], [12, 99]];
 /**
  * CE1 : produits des tables travaillées (palier 1 : tables de 2, 5, 10 ; palier 2 : aussi 3 et 4) ;
- * palier 3 : en plus quelques dizaines (3 × 20), produit ≤ 150.
+ * palier 3 : en plus quelques dizaines (3 × 20), produit ≤ 100.
  */
 function ab1(r: Rng, p: Palier): [number, number] {
-  if (p === 3 && r.next() < 0.3) { const a = r.int(2, 5), b = 10 * r.pick(a <= 3 ? [2, 3, 4, 5] : [2, 3]); return [a, b]; }
+  if (p === 3 && r.next() < 0.3) { const a = r.int(2, 5), b = 10 * r.pick(a === 2 ? [2, 3, 4, 5] : a === 3 ? [2, 3] : [2]); return [a, b]; }
   const t = r.pick(p === 1 ? [2, 5, 10] : [2, 3, 4, 5, 10]), o = r.int(2, p === 1 ? 9 : 10);
   return r.next() < 0.5 ? [t, o] : [o, t];
 }

@@ -12,9 +12,9 @@ export const duree: ExoType<DuData, number> = {
   generate(lv, p, seed) {
     const r = rng(seed);
     if (lv === 'CE1') {
-      // CE1 : heures en quarts d’heure ; palier 1 dans la même heure, puis jusqu’à 1 h, puis jusqu’à 2 h.
+      // CE1 : heures en quarts d’heure ; palier 1 dans la même heure, puis jusqu’à 1 h, puis jusqu’à 1 h 30 (≤ 100 min).
       for (;;) {
-        const h1 = r.int(7, 16), m1 = r.pick([0, 15, 30, 45]), dur = 15 * r.int(1, [3, 4, 8][p - 1]);
+        const h1 = r.int(7, 16), m1 = r.pick([0, 15, 30, 45]), dur = 15 * r.int(1, [3, 4, 6][p - 1]);
         const t2 = toMin(h1, m1) + dur;
         if (p === 1 && m1 + dur >= 60) continue;
         return { lv, p, h1, m1, h2: Math.floor(t2 / 60), m2: t2 % 60 };
